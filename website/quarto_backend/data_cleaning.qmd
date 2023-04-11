@@ -1,0 +1,11 @@
+---
+title: "Cleaning"
+---
+
+## Data cleaning
+
+Processes for cleaning and tidying data
+
+## Data Overview after cleaning 
+
+Shape and size of our data, transformations we did, how did we merge it, which files contain the data now

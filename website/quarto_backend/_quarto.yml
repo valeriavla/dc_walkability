@@ -1,0 +1,29 @@
+project:
+  type: website
+
+website:
+  title: "Walkability impact in D.C."
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - authors.qmd
+      - sidebar:data
+      - findings.qmd
+      - conclusion.qmd
+  sidebar:
+    - id: data
+      title: "Data"
+      contents:
+      - data_collection.qmd
+      - data_cleaning.qmd
+      - data_exploration.qmd
+
+format:
+  html:
+    embed-resources: true
+    theme: 
+    - zephyr
+    - custom.scss
+    css: styles.css
+    toc: true

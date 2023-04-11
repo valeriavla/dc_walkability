@@ -1,0 +1,12 @@
+---
+title: "Conclusion"
+---
+
+## Conclusion
+
+Summary of findings
+opinions on results
+
+## Future work
+
+What we were missing how to improve next steps
