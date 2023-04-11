@@ -1,0 +1,114 @@
+[
+  {
+    "objectID": "authors.html#cynthia-ng-cn524georgetown.edu",
+    "href": "authors.html#cynthia-ng-cn524georgetown.edu",
+    "title": "Authors",
+    "section": "Cynthia Ng cn524@georgetown.edu",
+    "text": "Cynthia Ng cn524@georgetown.edu"
+  },
+  {
+    "objectID": "authors.html#katherine-mead-kam515georgetown.edu",
+    "href": "authors.html#katherine-mead-kam515georgetown.edu",
+    "title": "Authors",
+    "section": "Katherine Mead kam515@georgetown.edu",
+    "text": "Katherine Mead kam515@georgetown.edu"
+  },
+  {
+    "objectID": "authors.html#madelyne-ventura-mv790georgetown.edu",
+    "href": "authors.html#madelyne-ventura-mv790georgetown.edu",
+    "title": "Authors",
+    "section": "Madelyne Ventura mv790@georgetown.edu",
+    "text": "Madelyne Ventura mv790@georgetown.edu"
+  },
+  {
+    "objectID": "authors.html#valeria-vera-lagos-vv188georgetown.edu",
+    "href": "authors.html#valeria-vera-lagos-vv188georgetown.edu",
+    "title": "Authors",
+    "section": "Valeria Vera Lagos vv188@georgetown.edu",
+    "text": "Valeria Vera Lagos vv188@georgetown.edu"
+  },
+  {
+    "objectID": "conclusion.html",
+    "href": "conclusion.html",
+    "title": "Conclusion",
+    "section": "",
+    "text": "Summary of findings opinions on results"
+  },
+  {
+    "objectID": "conclusion.html#future-work",
+    "href": "conclusion.html#future-work",
+    "title": "Conclusion",
+    "section": "Future work",
+    "text": "Future work\nWhat we were missing how to improve next steps"
+  },
+  {
+    "objectID": "data_cleaning.html",
+    "href": "data_cleaning.html",
+    "title": "Cleaning",
+    "section": "",
+    "text": "Processes for cleaning and tidying data"
+  },
+  {
+    "objectID": "data_cleaning.html#data-overview-after-cleaning",
+    "href": "data_cleaning.html#data-overview-after-cleaning",
+    "title": "Cleaning",
+    "section": "Data Overview after cleaning",
+    "text": "Data Overview after cleaning\nShape and size of our data, transformations we did, how did we merge it, which files contain the data now"
+  },
+  {
+    "objectID": "data_collection.html",
+    "href": "data_collection.html",
+    "title": "Collection",
+    "section": "",
+    "text": "What we were looking for"
+  },
+  {
+    "objectID": "data_collection.html#datasets-gathered",
+    "href": "data_collection.html#datasets-gathered",
+    "title": "Collection",
+    "section": "Datasets gathered",
+    "text": "Datasets gathered\nDatasets and how did we gather them\n\nByclicles\nWalkability\nHealth\nSentiment\nIncome\n\nAPI, websites (include links), problems with the data …\n\nBicycles\nThe objective of this data set was to obtain insights of x,y,z\n\n\nHealth"
+  },
+  {
+    "objectID": "data_exploration.html",
+    "href": "data_exploration.html",
+    "title": "Exploration",
+    "section": "",
+    "text": "Processes for exploring data and preview of results"
+  },
+  {
+    "objectID": "findings.html",
+    "href": "findings.html",
+    "title": "Findings",
+    "section": "",
+    "text": "Main findings full narrative summary and final visualizations"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Walkability in D.C.",
+    "section": "",
+    "text": "describe problem"
+  },
+  {
+    "objectID": "index.html#objective",
+    "href": "index.html#objective",
+    "title": "Walkability in D.C.",
+    "section": "Objective",
+    "text": "Objective\nObjective of this analysis"
+  },
+  {
+    "objectID": "index.html#questions",
+    "href": "index.html#questions",
+    "title": "Walkability in D.C.",
+    "section": "Questions",
+    "text": "Questions\nData Science questions"
+  },
+  {
+    "objectID": "index.html#bibliography",
+    "href": "index.html#bibliography",
+    "title": "Walkability in D.C.",
+    "section": "Bibliography",
+    "text": "Bibliography\nValeria to add citations feel free to list the resources you are using here"
+  }
+]
