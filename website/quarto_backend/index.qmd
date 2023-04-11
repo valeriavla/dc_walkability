@@ -1,0 +1,21 @@
+---
+title: "Walkability in D.C."
+---
+
+## Problem
+
+describe problem 
+
+## Objective
+
+Objective of this analysis 
+
+## Questions
+
+Data Science questions
+
+## Bibliography
+
+Valeria to add citations feel free to list the resources you are using here
+
+1.

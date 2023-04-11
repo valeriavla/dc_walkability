@@ -1,0 +1,25 @@
+---
+title: "Collection"
+---
+
+## Data overview
+
+What we were looking for
+
+## Datasets gathered 
+
+Datasets and how did we gather them
+
+* Byclicles
+* Walkability
+* Health
+* Sentiment 
+* Income 
+
+API, websites (include links), problems with the data ...
+
+### Bicycles 
+
+The objective of this data set was to obtain insights of  x,y,z 
+
+### Health 

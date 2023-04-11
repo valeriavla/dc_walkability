@@ -1,0 +1,18 @@
+---
+title: "Authors"
+---
+
+## Corrina Calanoc <clc317@georgetown.edu>
+![](img/corrina.jpg)
+
+## Cynthia Ng <cn524@georgetown.edu>
+![](img/cynthia.jpg)
+
+## Katherine Mead <kam515@georgetown.edu>
+![](img/katie.jpg)
+
+## Madelyne Ventura <mv790@georgetown.edu>
+![](img/madelyne.jpg)
+
+## Valeria Vera Lagos <vv188@georgetown.edu>
+![](img/valeria.jpg)
