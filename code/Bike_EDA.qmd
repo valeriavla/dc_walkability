@@ -303,3 +303,23 @@ points = alt.Chart(tmp2).mark_circle().encode(
 (background + connections + points).configure_view(stroke=None)
 
 ```
+
+To take this visualization a step further, I am going to add in the bike lane data to visualize where the lanes are located on our map with the Capital Bikeshare data.
+
+```{python}
+
+# Open GeoJSON file for bicycle lanes
+with open('../data/Bicycle_Lanes.geojson') as f:
+    data = json.load(f)
+
+
+# Create background of D.C.
+background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
+        stroke='green',
+        strokeWidth=1).properties(
+        width=600,
+        height=600
+    )
+
+(background + background_lanes + connections + points).configure_view(stroke=None)
+```
