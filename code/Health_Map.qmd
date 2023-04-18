@@ -1,0 +1,59 @@
+---
+title: "DC Health Data EDA"
+author: Katie Mead
+date: "4/18/2023"
+format:
+    html:
+        toc: true
+        embed-resources: true
+        theme: default
+        code-copy: true
+        code-line-numbers: true
+        code-fold: true
+---
+
+# Read in Datasets
+
+- DC GeoJSON File
+- 
+
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+import plotly.graph_objects as go
+#from vega_datasets import data
+import requests
+import json
+```
+
+# Washington DC map with no data encoded
+
+
+```{python}
+# Function to download geojson file
+response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+# Create background of D.C.
+background = alt.Chart(alt.Data(values=response1.json())).mark_geoshape(
+        fill="lightgray",
+        stroke='white',
+        strokeWidth=1
+    ).encode(
+    ).properties(
+        width=600,
+        height=600
+    )
+background
+```
+
+
+# Health Data
+- Source: PLACES Census Health Data Estimation
+```{python}
+# import the csv
+dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
+
+# filter for DC
+dc_health_df.head()
+
+```
