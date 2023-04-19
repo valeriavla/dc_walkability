@@ -114,7 +114,8 @@ nondc_stations = [
     32204,32205,32203,32206,32222,32230,32232,32600,32602,32603,32608,32605,32604,32607,32609,
     31948,31904,32606,32601,31921,31905,31902,31901,31976,31036,31977,31900,31920,31049,31037,
     31926,31919,31035,31973,31069,31023,31022,31021,31019,31020,31094,31092,31079,31030,31029,
-    31080,31093,31014,31062,31077,31073,31024,31040,31028,31017,31924,31027,31947,31066,31075,31949,31053,31971,31067,31058,31923,31063,31068,31951,31945,31095,31006,31005,31091,31004,
+    31080,31093,31014,31062,31077,31073,31024,31040,31028,31017,31924,31027,31947,31066,31075,
+    31949,31053,31971,31067,31058,31923,31063,31068,31951,31945,31095,31006,31005,31091,31004,
     31936,31071,31090,31950,31064,31935,31011,31012,31009,31944,31052,31010,31959,31916,31088,
     31960,31956,31910,31083,31915,31087,31085,31913,31915,31970,31969,31906,31098,31048,31081,
     31084,31082,31974,31930,31932,31953,31942,31967,32406,32423,32415,32407,32405,32401,32400,
@@ -238,12 +239,12 @@ Using this methodology, I am going to create a dynamic visualization that is mad
 
 ```{python}
 
-#### BACKGROUND FOR MAP 
+#### BACKGROUND FOR DC MAP 
 
 # Define background of Washington D.C.
 response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
 
-background = alt.Chart(alt.Data(values=response1.json())).mark_geoshape(
+background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bike Lanes, Capital Bikeshare Stations, & Routes in March 2023").mark_geoshape(
         fill="lightgray",
         stroke='white',
         strokeWidth=1
@@ -252,6 +253,24 @@ background = alt.Chart(alt.Data(values=response1.json())).mark_geoshape(
         width=600,
         height=600
     )
+
+#### BACKGROUND FOR DC BIKE LANE LOCATIONS 
+
+# Open GeoJSON file for bicycle lanes
+with open('../data/Bicycle_Lanes.geojson') as f:
+    data = json.load(f)
+
+
+# Create background of D.C.
+background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
+        stroke='#d6a320',
+        strokeWidth=1
+        ).properties(
+        width=600,
+        height=600
+    )
+
+
 
 #### MOUSEOVER SELECTION
 
@@ -288,38 +307,25 @@ tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
 # Temporary dataframe showing unique station locations with ride count
 tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
 tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+# TEST
+tmp2['color'] = 'Bike Station'
 
 points = alt.Chart(tmp2).mark_circle().encode(
     latitude="start_lat:Q",
     longitude="start_lng:Q",
+    color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
     size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
     order=alt.Order("count_rides:Q", sort="descending"),
-    tooltip=["start_station_name:N", "start_station_id:Q", "count_rides:Q"]
+    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
+             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
+             alt.Tooltip('count_rides:Q', title='Ride Count')
+             ]
 ).add_selection(
     select_station
 )
 
+
 # Show visualization
-(background + connections + points).configure_view(stroke=None)
-
-```
-
-To take this visualization a step further, I am going to add in the bike lane data to visualize where the lanes are located on our map with the Capital Bikeshare data.
-
-```{python}
-
-# Open GeoJSON file for bicycle lanes
-with open('../data/Bicycle_Lanes.geojson') as f:
-    data = json.load(f)
-
-
-# Create background of D.C.
-background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
-        stroke='green',
-        strokeWidth=1).properties(
-        width=600,
-        height=600
-    )
-
 (background + background_lanes + connections + points).configure_view(stroke=None)
+
 ```
