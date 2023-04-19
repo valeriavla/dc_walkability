@@ -1,0 +1,356 @@
+{
+    "nodes": [
+        {
+            "name": "access",
+            "value": 1,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "bicycle",
+            "value": 2,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "bike",
+            "value": 3,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "capital",
+            "value": 4,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "capitol",
+            "value": 5,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "car",
+            "value": 6,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "columbia",
+            "value": 7,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "creek",
+            "value": 8,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "crescent",
+            "value": 9,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "east",
+            "value": 10,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "easy",
+            "value": 11,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "get",
+            "value": 12,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "good",
+            "value": 13,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "google",
+            "value": 14,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "heights",
+            "value": 15,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "hill",
+            "value": 16,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "infrastructure",
+            "value": 17,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "lane",
+            "value": 18,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "lanes",
+            "value": 19,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "left",
+            "value": 20,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "lock",
+            "value": 21,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "maps",
+            "value": 22,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "mt",
+            "value": 23,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "navy",
+            "value": 24,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "ne",
+            "value": 25,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "old",
+            "value": 26,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "park",
+            "value": 27,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "pretty",
+            "value": 28,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "protected",
+            "value": 29,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "rock",
+            "value": 30,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "silver",
+            "value": 31,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "spring",
+            "value": 32,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "st",
+            "value": 33,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "street",
+            "value": 34,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "th",
+            "value": 35,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "town",
+            "value": 36,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "traffic",
+            "value": 37,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "trail",
+            "value": 38,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "turn",
+            "value": 39,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "u",
+            "value": 40,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "vernon",
+            "value": 41,
+            "colour": "#bde0f6"
+        },
+        {
+            "name": "yard",
+            "value": 42,
+            "colour": "#bde0f6"
+        }
+    ],
+    "links": [
+        {
+            "source": 5,
+            "target": 16,
+            "value": 8
+        },
+        {
+            "source": 10,
+            "target": 5,
+            "value": 5
+        },
+        {
+            "source": 29,
+            "target": 3,
+            "value": 10
+        },
+        {
+            "source": 40,
+            "target": 21,
+            "value": 5
+        },
+        {
+            "source": 35,
+            "target": 33,
+            "value": 7
+        },
+        {
+            "source": 6,
+            "target": 37,
+            "value": 5
+        },
+        {
+            "source": 25,
+            "target": 39,
+            "value": 8
+        },
+        {
+            "source": 26,
+            "target": 36,
+            "value": 5
+        },
+        {
+            "source": 34,
+            "target": 25,
+            "value": 10
+        },
+        {
+            "source": 12,
+            "target": 3,
+            "value": 5
+        },
+        {
+            "source": 9,
+            "target": 38,
+            "value": 5
+        },
+        {
+            "source": 14,
+            "target": 22,
+            "value": 8
+        },
+        {
+            "source": 23,
+            "target": 41,
+            "value": 7
+        },
+        {
+            "source": 30,
+            "target": 8,
+            "value": 20
+        },
+        {
+            "source": 7,
+            "target": 15,
+            "value": 6
+        },
+        {
+            "source": 39,
+            "target": 20,
+            "value": 5
+        },
+        {
+            "source": 3,
+            "target": 19,
+            "value": 23
+        },
+        {
+            "source": 31,
+            "target": 32,
+            "value": 9
+        },
+        {
+            "source": 11,
+            "target": 1,
+            "value": 6
+        },
+        {
+            "source": 2,
+            "target": 19,
+            "value": 5
+        },
+        {
+            "source": 35,
+            "target": 34,
+            "value": 6
+        },
+        {
+            "source": 28,
+            "target": 13,
+            "value": 5
+        },
+        {
+            "source": 20,
+            "target": 35,
+            "value": 5
+        },
+        {
+            "source": 24,
+            "target": 42,
+            "value": 5
+        },
+        {
+            "source": 8,
+            "target": 27,
+            "value": 11
+        },
+        {
+            "source": 4,
+            "target": 9,
+            "value": 8
+        },
+        {
+            "source": 3,
+            "target": 17,
+            "value": 5
+        },
+        {
+            "source": 3,
+            "target": 18,
+            "value": 25
+        }
+    ]
+}
