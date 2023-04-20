@@ -1,0 +1,1011 @@
+{
+    "nodes": [
+        {
+            "name": "actually",
+            "n": 1,
+            "grp": 1,
+            "id": "actually"
+        },
+        {
+            "name": "ago",
+            "n": 2,
+            "grp": 1,
+            "id": "ago"
+        },
+        {
+            "name": "area",
+            "n": 3,
+            "grp": 1,
+            "id": "area"
+        },
+        {
+            "name": "automated",
+            "n": 4,
+            "grp": 1,
+            "id": "automated"
+        },
+        {
+            "name": "ave",
+            "n": 5,
+            "grp": 1,
+            "id": "ave"
+        },
+        {
+            "name": "avenue",
+            "n": 6,
+            "grp": 1,
+            "id": "avenue"
+        },
+        {
+            "name": "back",
+            "n": 7,
+            "grp": 1,
+            "id": "back"
+        },
+        {
+            "name": "bottom",
+            "n": 8,
+            "grp": 1,
+            "id": "bottom"
+        },
+        {
+            "name": "brand",
+            "n": 9,
+            "grp": 1,
+            "id": "brand"
+        },
+        {
+            "name": "bus",
+            "n": 10,
+            "grp": 1,
+            "id": "bus"
+        },
+        {
+            "name": "camera",
+            "n": 11,
+            "grp": 1,
+            "id": "camera"
+        },
+        {
+            "name": "cameras",
+            "n": 12,
+            "grp": 1,
+            "id": "cameras"
+        },
+        {
+            "name": "cams",
+            "n": 13,
+            "grp": 1,
+            "id": "cams"
+        },
+        {
+            "name": "car",
+            "n": 14,
+            "grp": 1,
+            "id": "car"
+        },
+        {
+            "name": "cars",
+            "n": 15,
+            "grp": 1,
+            "id": "cars"
+        },
+        {
+            "name": "catch",
+            "n": 16,
+            "grp": 1,
+            "id": "catch"
+        },
+        {
+            "name": "city",
+            "n": 17,
+            "grp": 1,
+            "id": "city"
+        },
+        {
+            "name": "class",
+            "n": 18,
+            "grp": 1,
+            "id": "class"
+        },
+        {
+            "name": "connecticut",
+            "n": 19,
+            "grp": 1,
+            "id": "connecticut"
+        },
+        {
+            "name": "could",
+            "n": 20,
+            "grp": 1,
+            "id": "could"
+        },
+        {
+            "name": "dangerously",
+            "n": 21,
+            "grp": 1,
+            "id": "dangerously"
+        },
+        {
+            "name": "day",
+            "n": 22,
+            "grp": 1,
+            "id": "day"
+        },
+        {
+            "name": "days",
+            "n": 23,
+            "grp": 1,
+            "id": "days"
+        },
+        {
+            "name": "deaths",
+            "n": 24,
+            "grp": 1,
+            "id": "deaths"
+        },
+        {
+            "name": "doesnt",
+            "n": 25,
+            "grp": 1,
+            "id": "doesnt"
+        },
+        {
+            "name": "drive",
+            "n": 26,
+            "grp": 1,
+            "id": "drive"
+        },
+        {
+            "name": "driving",
+            "n": 27,
+            "grp": 1,
+            "id": "driving"
+        },
+        {
+            "name": "earlier",
+            "n": 28,
+            "grp": 1,
+            "id": "earlier"
+        },
+        {
+            "name": "enforcement",
+            "n": 29,
+            "grp": 1,
+            "id": "enforcement"
+        },
+        {
+            "name": "every",
+            "n": 30,
+            "grp": 1,
+            "id": "every"
+        },
+        {
+            "name": "feel",
+            "n": 31,
+            "grp": 1,
+            "id": "feel"
+        },
+        {
+            "name": "feels",
+            "n": 32,
+            "grp": 1,
+            "id": "feels"
+        },
+        {
+            "name": "get",
+            "n": 33,
+            "grp": 1,
+            "id": "get"
+        },
+        {
+            "name": "getting",
+            "n": 34,
+            "grp": 1,
+            "id": "getting"
+        },
+        {
+            "name": "go",
+            "n": 35,
+            "grp": 1,
+            "id": "go"
+        },
+        {
+            "name": "gon",
+            "n": 36,
+            "grp": 1,
+            "id": "gon"
+        },
+        {
+            "name": "grab",
+            "n": 37,
+            "grp": 1,
+            "id": "grab"
+        },
+        {
+            "name": "grocery",
+            "n": 38,
+            "grp": 1,
+            "id": "grocery"
+        },
+        {
+            "name": "home",
+            "n": 39,
+            "grp": 1,
+            "id": "home"
+        },
+        {
+            "name": "hour",
+            "n": 40,
+            "grp": 1,
+            "id": "hour"
+        },
+        {
+            "name": "know",
+            "n": 41,
+            "grp": 1,
+            "id": "know"
+        },
+        {
+            "name": "leave",
+            "n": 42,
+            "grp": 1,
+            "id": "leave"
+        },
+        {
+            "name": "license",
+            "n": 43,
+            "grp": 1,
+            "id": "license"
+        },
+        {
+            "name": "like",
+            "n": 44,
+            "grp": 1,
+            "id": "like"
+        },
+        {
+            "name": "likely",
+            "n": 45,
+            "grp": 1,
+            "id": "likely"
+        },
+        {
+            "name": "limit",
+            "n": 46,
+            "grp": 1,
+            "id": "limit"
+        },
+        {
+            "name": "limits",
+            "n": 47,
+            "grp": 1,
+            "id": "limits"
+        },
+        {
+            "name": "live",
+            "n": 48,
+            "grp": 1,
+            "id": "live"
+        },
+        {
+            "name": "lower",
+            "n": 49,
+            "grp": 1,
+            "id": "lower"
+        },
+        {
+            "name": "make",
+            "n": 50,
+            "grp": 1,
+            "id": "make"
+        },
+        {
+            "name": "makes",
+            "n": 51,
+            "grp": 1,
+            "id": "makes"
+        },
+        {
+            "name": "maryland",
+            "n": 52,
+            "grp": 1,
+            "id": "maryland"
+        },
+        {
+            "name": "maybe",
+            "n": 53,
+            "grp": 1,
+            "id": "maybe"
+        },
+        {
+            "name": "md",
+            "n": 54,
+            "grp": 1,
+            "id": "md"
+        },
+        {
+            "name": "metro",
+            "n": 55,
+            "grp": 1,
+            "id": "metro"
+        },
+        {
+            "name": "minutes",
+            "n": 56,
+            "grp": 1,
+            "id": "minutes"
+        },
+        {
+            "name": "money",
+            "n": 57,
+            "grp": 1,
+            "id": "money"
+        },
+        {
+            "name": "much",
+            "n": 58,
+            "grp": 1,
+            "id": "much"
+        },
+        {
+            "name": "na",
+            "n": 59,
+            "grp": 1,
+            "id": "na"
+        },
+        {
+            "name": "need",
+            "n": 60,
+            "grp": 1,
+            "id": "need"
+        },
+        {
+            "name": "never",
+            "n": 61,
+            "grp": 1,
+            "id": "never"
+        },
+        {
+            "name": "new",
+            "n": 62,
+            "grp": 1,
+            "id": "new"
+        },
+        {
+            "name": "one",
+            "n": 63,
+            "grp": 1,
+            "id": "one"
+        },
+        {
+            "name": "pedestrian",
+            "n": 64,
+            "grp": 1,
+            "id": "pedestrian"
+        },
+        {
+            "name": "people",
+            "n": 65,
+            "grp": 1,
+            "id": "people"
+        },
+        {
+            "name": "posted",
+            "n": 66,
+            "grp": 1,
+            "id": "posted"
+        },
+        {
+            "name": "public",
+            "n": 67,
+            "grp": 1,
+            "id": "public"
+        },
+        {
+            "name": "reason",
+            "n": 68,
+            "grp": 1,
+            "id": "reason"
+        },
+        {
+            "name": "removed",
+            "n": 69,
+            "grp": 1,
+            "id": "removed"
+        },
+        {
+            "name": "renew",
+            "n": 70,
+            "grp": 1,
+            "id": "renew"
+        },
+        {
+            "name": "rush",
+            "n": 71,
+            "grp": 1,
+            "id": "rush"
+        },
+        {
+            "name": "safer",
+            "n": 72,
+            "grp": 1,
+            "id": "safer"
+        },
+        {
+            "name": "safety",
+            "n": 73,
+            "grp": 1,
+            "id": "safety"
+        },
+        {
+            "name": "sense",
+            "n": 74,
+            "grp": 1,
+            "id": "sense"
+        },
+        {
+            "name": "shopping",
+            "n": 75,
+            "grp": 1,
+            "id": "shopping"
+        },
+        {
+            "name": "since",
+            "n": 76,
+            "grp": 1,
+            "id": "since"
+        },
+        {
+            "name": "slow",
+            "n": 77,
+            "grp": 1,
+            "id": "slow"
+        },
+        {
+            "name": "slower",
+            "n": 78,
+            "grp": 1,
+            "id": "slower"
+        },
+        {
+            "name": "something",
+            "n": 79,
+            "grp": 1,
+            "id": "something"
+        },
+        {
+            "name": "speed",
+            "n": 80,
+            "grp": 1,
+            "id": "speed"
+        },
+        {
+            "name": "speeding",
+            "n": 81,
+            "grp": 1,
+            "id": "speeding"
+        },
+        {
+            "name": "stays",
+            "n": 82,
+            "grp": 1,
+            "id": "stays"
+        },
+        {
+            "name": "streets",
+            "n": 83,
+            "grp": 1,
+            "id": "streets"
+        },
+        {
+            "name": "take",
+            "n": 84,
+            "grp": 1,
+            "id": "take"
+        },
+        {
+            "name": "tickets",
+            "n": 85,
+            "grp": 1,
+            "id": "tickets"
+        },
+        {
+            "name": "time",
+            "n": 86,
+            "grp": 1,
+            "id": "time"
+        },
+        {
+            "name": "times",
+            "n": 87,
+            "grp": 1,
+            "id": "times"
+        },
+        {
+            "name": "traffic",
+            "n": 88,
+            "grp": 1,
+            "id": "traffic"
+        },
+        {
+            "name": "transportation",
+            "n": 89,
+            "grp": 1,
+            "id": "transportation"
+        },
+        {
+            "name": "twice",
+            "n": 90,
+            "grp": 1,
+            "id": "twice"
+        },
+        {
+            "name": "unpaid",
+            "n": 91,
+            "grp": 1,
+            "id": "unpaid"
+        },
+        {
+            "name": "use",
+            "n": 92,
+            "grp": 1,
+            "id": "use"
+        },
+        {
+            "name": "used",
+            "n": 93,
+            "grp": 1,
+            "id": "used"
+        },
+        {
+            "name": "va",
+            "n": 94,
+            "grp": 1,
+            "id": "va"
+        },
+        {
+            "name": "variance",
+            "n": 95,
+            "grp": 1,
+            "id": "variance"
+        },
+        {
+            "name": "virginia",
+            "n": 96,
+            "grp": 1,
+            "id": "virginia"
+        },
+        {
+            "name": "week",
+            "n": 97,
+            "grp": 1,
+            "id": "week"
+        },
+        {
+            "name": "without",
+            "n": 98,
+            "grp": 1,
+            "id": "without"
+        },
+        {
+            "name": "work",
+            "n": 99,
+            "grp": 1,
+            "id": "work"
+        },
+        {
+            "name": "years",
+            "n": 100,
+            "grp": 1,
+            "id": "years"
+        }
+    ],
+    "links": [
+        {
+            "source": "days",
+            "target": "week",
+            "value": 3
+        },
+        {
+            "source": "people",
+            "target": "getting",
+            "value": 3
+        },
+        {
+            "source": "take",
+            "target": "public",
+            "value": 3
+        },
+        {
+            "source": "traffic",
+            "target": "camera",
+            "value": 3
+        },
+        {
+            "source": "metro",
+            "target": "bus",
+            "value": 4
+        },
+        {
+            "source": "drive",
+            "target": "speed",
+            "value": 3
+        },
+        {
+            "source": "grocery",
+            "target": "shopping",
+            "value": 3
+        },
+        {
+            "source": "drive",
+            "target": "maybe",
+            "value": 3
+        },
+        {
+            "source": "years",
+            "target": "ago",
+            "value": 3
+        },
+        {
+            "source": "connecticut",
+            "target": "avenue",
+            "value": 4
+        },
+        {
+            "source": "pedestrian",
+            "target": "deaths",
+            "value": 3
+        },
+        {
+            "source": "take",
+            "target": "metro",
+            "value": 8
+        },
+        {
+            "source": "need",
+            "target": "car",
+            "value": 6
+        },
+        {
+            "source": "gon",
+            "target": "na",
+            "value": 3
+        },
+        {
+            "source": "rush",
+            "target": "hour",
+            "value": 4
+        },
+        {
+            "source": "bus",
+            "target": "metro",
+            "value": 4
+        },
+        {
+            "source": "get",
+            "target": "tickets",
+            "value": 3
+        },
+        {
+            "source": "every",
+            "target": "time",
+            "value": 4
+        },
+        {
+            "source": "car",
+            "target": "one",
+            "value": 3
+        },
+        {
+            "source": "driving",
+            "target": "slower",
+            "value": 3
+        },
+        {
+            "source": "car",
+            "target": "minutes",
+            "value": 3
+        },
+        {
+            "source": "md",
+            "target": "va",
+            "value": 6
+        },
+        {
+            "source": "brand",
+            "target": "new",
+            "value": 3
+        },
+        {
+            "source": "renew",
+            "target": "license",
+            "value": 3
+        },
+        {
+            "source": "maryland",
+            "target": "virginia",
+            "value": 3
+        },
+        {
+            "source": "times",
+            "target": "week",
+            "value": 5
+        },
+        {
+            "source": "lower",
+            "target": "class",
+            "value": 3
+        },
+        {
+            "source": "unpaid",
+            "target": "tickets",
+            "value": 3
+        },
+        {
+            "source": "make",
+            "target": "money",
+            "value": 4
+        },
+        {
+            "source": "every",
+            "target": "day",
+            "value": 9
+        },
+        {
+            "source": "without",
+            "target": "metro",
+            "value": 4
+        },
+        {
+            "source": "make",
+            "target": "safer",
+            "value": 3
+        },
+        {
+            "source": "know",
+            "target": "speed",
+            "value": 3
+        },
+        {
+            "source": "speeding",
+            "target": "tickets",
+            "value": 5
+        },
+        {
+            "source": "back",
+            "target": "home",
+            "value": 3
+        },
+        {
+            "source": "dangerously",
+            "target": "slow",
+            "value": 4
+        },
+        {
+            "source": "speed",
+            "target": "limit",
+            "value": 25
+        },
+        {
+            "source": "live",
+            "target": "city",
+            "value": 4
+        },
+        {
+            "source": "cars",
+            "target": "driving",
+            "value": 3
+        },
+        {
+            "source": "get",
+            "target": "work",
+            "value": 3
+        },
+        {
+            "source": "much",
+            "target": "driving",
+            "value": 3
+        },
+        {
+            "source": "traffic",
+            "target": "cams",
+            "value": 3
+        },
+        {
+            "source": "car",
+            "target": "metro",
+            "value": 4
+        },
+        {
+            "source": "leave",
+            "target": "earlier",
+            "value": 4
+        },
+        {
+            "source": "without",
+            "target": "car",
+            "value": 4
+        },
+        {
+            "source": "car",
+            "target": "stays",
+            "value": 3
+        },
+        {
+            "source": "never",
+            "target": "drive",
+            "value": 3
+        },
+        {
+            "source": "people",
+            "target": "like",
+            "value": 3
+        },
+        {
+            "source": "removed",
+            "target": "removed",
+            "value": 4
+        },
+        {
+            "source": "speed",
+            "target": "cameras",
+            "value": 6
+        },
+        {
+            "source": "likely",
+            "target": "catch",
+            "value": 3
+        },
+        {
+            "source": "maybe",
+            "target": "twice",
+            "value": 3
+        },
+        {
+            "source": "makes",
+            "target": "sense",
+            "value": 3
+        },
+        {
+            "source": "feels",
+            "target": "like",
+            "value": 4
+        },
+        {
+            "source": "automated",
+            "target": "enforcement",
+            "value": 3
+        },
+        {
+            "source": "speed",
+            "target": "camera",
+            "value": 6
+        },
+        {
+            "source": "camera",
+            "target": "bottom",
+            "value": 3
+        },
+        {
+            "source": "speed",
+            "target": "limits",
+            "value": 4
+        },
+        {
+            "source": "doesnt",
+            "target": "go",
+            "value": 3
+        },
+        {
+            "source": "used",
+            "target": "drive",
+            "value": 4
+        },
+        {
+            "source": "use",
+            "target": "metro",
+            "value": 7
+        },
+        {
+            "source": "live",
+            "target": "area",
+            "value": 3
+        },
+        {
+            "source": "could",
+            "target": "get",
+            "value": 3
+        },
+        {
+            "source": "money",
+            "target": "grab",
+            "value": 3
+        },
+        {
+            "source": "something",
+            "target": "like",
+            "value": 3
+        },
+        {
+            "source": "car",
+            "target": "since",
+            "value": 3
+        },
+        {
+            "source": "public",
+            "target": "transportation",
+            "value": 9
+        },
+        {
+            "source": "traffic",
+            "target": "safety",
+            "value": 3
+        },
+        {
+            "source": "catch",
+            "target": "people",
+            "value": 5
+        },
+        {
+            "source": "actually",
+            "target": "make",
+            "value": 4
+        },
+        {
+            "source": "speeding",
+            "target": "cameras",
+            "value": 4
+        },
+        {
+            "source": "one",
+            "target": "day",
+            "value": 3
+        },
+        {
+            "source": "drive",
+            "target": "week",
+            "value": 3
+        },
+        {
+            "source": "day",
+            "target": "metro",
+            "value": 3
+        },
+        {
+            "source": "one",
+            "target": "streets",
+            "value": 3
+        },
+        {
+            "source": "people",
+            "target": "live",
+            "value": 3
+        },
+        {
+            "source": "speed",
+            "target": "variance",
+            "value": 3
+        },
+        {
+            "source": "connecticut",
+            "target": "ave",
+            "value": 3
+        },
+        {
+            "source": "feel",
+            "target": "like",
+            "value": 3
+        },
+        {
+            "source": "posted",
+            "target": "speed",
+            "value": 12
+        },
+        {
+            "source": "reason",
+            "target": "drive",
+            "value": 3
+        }
+    ]
+}
