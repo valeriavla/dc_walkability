@@ -42,13 +42,6 @@
     "text": "Future work\nWhat we were missing how to improve next steps"
   },
   {
-    "objectID": "data_cleaning.html",
-    "href": "data_cleaning.html",
-    "title": "Cleaning",
-    "section": "",
-    "text": "Processes for cleaning and tidying data"
-  },
-  {
     "objectID": "data_cleaning.html#data-overview-after-cleaning",
     "href": "data_cleaning.html#data-overview-after-cleaning",
     "title": "Cleaning",
@@ -82,33 +75,5 @@
     "title": "Findings",
     "section": "",
     "text": "Main findings full narrative summary and final visualizations"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Walkability in D.C.",
-    "section": "",
-    "text": "describe problem"
-  },
-  {
-    "objectID": "index.html#objective",
-    "href": "index.html#objective",
-    "title": "Walkability in D.C.",
-    "section": "Objective",
-    "text": "Objective\nObjective of this analysis"
-  },
-  {
-    "objectID": "index.html#questions",
-    "href": "index.html#questions",
-    "title": "Walkability in D.C.",
-    "section": "Questions",
-    "text": "Questions\nData Science questions"
-  },
-  {
-    "objectID": "index.html#bibliography",
-    "href": "index.html#bibliography",
-    "title": "Walkability in D.C.",
-    "section": "Bibliography",
-    "text": "Bibliography\nValeria to add citations feel free to list the resources you are using here"
   }
 ]

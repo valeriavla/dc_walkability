@@ -1,0 +1,21 @@
+---
+title: "Methods"
+---
+
+## Methods
+
+### 1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
+
+Using the Pandas, Geopandas, and Altair libraries, we generated an interactive visualization of walkability and socio-economic outcomes in Washington, D.C. First, we normalized the walkability scores to a range of 0 to 100 so that the scores are more intuitive to the audience. Then, we conducted some basic data, including converting missing or negative values to NaN values, renaming columns, and melting data. To generate the interactive visualization, we used the Altair library to create a bar chart with tract or neighborhood names on the x-axis, variable names on the y-axis, and variable values as the bar heights. We further aggregate the data at the national level by calculating the average of the variable values for all neighborhoods, and store the aggregated data in a separate dataframe.
+
+### 2. How is walkability associated with health outcomes in Washington, D.C.?
+
+We first read in the PLACES Census Tract Data and conduct some basic cleaning, such as selecting only data related to Washington, D.C. and renaming columns. Then, to do some basic data exploration, we created an exploratory scatter plot using Plotly, where we can examine the relationship between pairs of user-selected health outcomes in D.C. on the x-axis and y-axis. We used a callback function, update_visibility, to update the visibility of the scatter plot traces based on the selected values from the drop-down menus. Based on this we created a second graph where we explore the relationship between walkability and health outcomes. We created two drop-down menus using Plotly's dcc.Dropdown. The selected values from the drop-down menus are passed to the update_visibility function, which then updates the scatter plot based on the selected health metrics. We then displayed the final plot using Plotly's dcc.Graph.
+
+### 3. How accessible are neighborhoods in Washington, D.C. by bike?
+
+In the `Altair` plot, we combined March 2023 Capital Bikeshare Data with D.C. geographical data to create a layered visual. The geographical layout is a map of D.C. with each neighborhood outlined by white. Each point represents a Capital Bikeshare Station with the size representing the amount of trips starting from that station in the month of March. The yellow lines represent the bike lanes created by the D.C. government on public streets. When the user hovers over any station, the visual will show black network lines (or edges) that connect that station ("start" station) to other stations ("end" stations), representing where people have traveled to with the Capital Bikeshare bikes. We also included tooltips that display the station information and appear when a user hovers over a station.
+
+### 4. What is public sentiment around walkability in Washington, D.C.? 
+
+We generated visualizations using Plotly library in Python to analyze sentiment polarity of comments related to different categories (bike, walk, and car). We first load and clean data from three different CSV files (b_sent.csv, c_sent.csv, and w_sent.csv) which contain sentiment analysis results for comments related to bikes, cars, and walking, respectively. Next, we create three box plots using Plotly, one for each category of transport. We plotted the sentiment polarity values on the y-axis, and the categories on the x-axis. After the first graph, we create a 2D histogram contour plot and two more histograms. The contour plot (trace2) shows the density of sentiment polarity values for each category, with darker areas indicating higher density. The two histograms (trace3 and trace4) show the distribution of sentiment polarity values along the x-axis and categories along the y-axis separately. The final visualizations provide insights into the sentiment polarity of comments related to different categories, allowing for a comparison of sentiment distribution across categories.

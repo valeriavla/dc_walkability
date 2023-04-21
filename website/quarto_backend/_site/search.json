@@ -88,7 +88,7 @@
     "href": "index.html",
     "title": "Walkability in D.C.",
     "section": "",
-    "text": "describe problem"
+    "text": "Walkability is defined as the ease with which people can access amenities in a place without the use of cars. Walkability is associated with equitable access to key resources as well as positive outcomes in health, social bonding and community-building, sustainability, and the economy. While urban areas in the US initially developed around transportation by foot, the mass introduction of cars and motorized vehicles in the 1950s led to urban sprawl, which is an expansion pattern consisting of low-density areas and car-dependent lifestyles (Galeser & Kahn, 2004). A report by the Institute for Transportation and Development Policy evaluated the walkability of nearly 1,000 cities globally. The report placed London, Hong Kong, Paris, and Bogotá as cities with highest walkability scores and U.S. cities particularly low on the list as a result of urban sprawl (Hubbarb 2020).\nThe same report found that the only city in the US to make the top 25 in any category was Washington, D.C. Our personal experience living in Washington, D.C. also mirrors the fact that Washington, D.C. seems like a relatively walkable city compared to other cities in the US. Some of us have also lived in walkable cities around the world and saw first-hand the impact of high walkability on well-being. As our graduate program has brought us together from around the world to Washington, D.C., it would not just be professionally rewarding, but also personally meaningful to explore the city’s walkability.\nTo explore this topic further, we aim to answer the following data science questions:\n\nHow accessible are different neighborhoods in Washington, D.C. by foot and by bike?\nHow is walkabilty associated with social and health outcomes in Washington, D.C.?\nWhat is public sentiment around walkability in Washington, D.C.?\n\nWe answer these questions by first investigating the ease of access of different neighborhoods, or census tracts, by foot. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Then, we explore the correlation between walkability in different tracts and social and health outcomes. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic."
   },
   {
     "objectID": "index.html#objective",
@@ -109,6 +109,6 @@
     "href": "index.html#bibliography",
     "title": "Walkability in D.C.",
     "section": "Bibliography",
-    "text": "Bibliography\nValeria to add citations feel free to list the resources you are using here"
+    "text": "Bibliography\nValeria to add citations feel free to list the resources you are using here\n1.https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds 2. Glaeser, E. L., and Kahn, M. E. (2004). “Sprawl and Urban Growth,” in Handbook of Regional and Urban Economics (Elsevier), 2481–2527. doi:10.1016/s1574-0080(04)80013-0"
   }
 ]

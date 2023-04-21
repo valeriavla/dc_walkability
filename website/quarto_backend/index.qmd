@@ -2,24 +2,998 @@
 title: "Walkability in D.C."
 ---
 
-## Background
+## Introduction
 
-Walkability is defined as the ease with which people can access amenities in a place without the use of cars. Walkability is associated with equitable access to key resources as well as positive outcomes in health, social bonding and community-building, sustainability, and livability. While urban areas in the US initially developed around transportation by foot, the mass introduction of cars and motorized vehicles in the 1950s led to urban sprawl, which is an expansion pattern consisting of low-density areas and car-dependent lifestyles (Galeser & Kahn, 2004). A report by the Institute for Transportation and Development Policy evaluated the walkability of nearly 1,000 cities globally. The report placed London, Hong Kong, and Paris as some of the cities with highest walkability scores and U.S. cities particularly low on the list as a result of urban sprawl (Hubbarb 2020). 
+Walkability is defined as the ease with which people can access amenities in a place without the use of cars. Walkability is associated with equitable access to key resources as well as positive outcomes in health, social bonding and community-building, sustainability, and the economy. While urban areas in the US initially developed around transportation by foot, the mass introduction of cars and motorized vehicles in the 1950s led to urban sprawl, which is an expansion pattern consisting of low-density areas and car-dependent lifestyles[^1]. A report by the Institute for Transportation and Development Policy evaluated the walkability of nearly 1,000 cities globally. The report placed London, Hong Kong, Paris, and Bogotá as cities with highest walkability scores and U.S. cities particularly low on the list as a result of urban sprawl[^2]. 
 
-The same report found that the only city in the US to make the top 25 in any category was Washington, D.C. Our personal experience living in Washington, D.C. also mirrors the fact that Washington, D.C. seems like a walkable city compared to many other cities in the US. However, some members in our group have also lived in cities with high walkability around the world and saw first-hand the impact of a city's walkability on well-being. As our graduate program has brought us together from around the world to Washington, D.C., it would not just be professionally intriguing, but also personally meaningful to learn more about the city's walkability. 
+The same report found that the only city in the US to make the top 25 in any category was Washington, D.C. Our personal experience living in Washington, D.C. also mirrors the fact that Washington, D.C. seems like a relatively walkable city compared to other cities in the US. Some of us have also lived in walkable cities around the world and saw first-hand the impact of high walkability on well-being. As our graduate program has brought us together from around the world to Washington, D.C., it would not just be professionally rewarding, but also personally meaningful to explore the city's walkability. 
 
-## Objective
+To explore this topic further, we aim to answer the following data science questions: 
 
-Objective of this analysis 
+1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
+2. How is walkability associated with health outcomes in Washington, D.C.?
+3. How accessible are neighborhoods in Washington, D.C. by bike? 
+4. What is public sentiment around walkability in Washington, D.C.? 
 
-## Questions
+We answer these questions by first collecting, cleaning, and exploring US Census Tract, Capital Bike Share, PLACES Census Health Data Estimation, and Reddit data. Based on our initial data exploration, we investigate the ease of access of different neighborhoods, or census tracts, by foot, which is our primary measure of walkability. We also explore the correlation between walkability in different tracts and social and health outcomes. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic. 
 
-Data Science questions
+[^1] [Glaeser & Kahn 2004](https://www.sciencedirect.com/science/article/abs/pii/S1574008004800130)
+[^2] [US News U.S. Cities Trail Behind Global Peers in Walkability Report Finds](https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds)
+
+
+## 1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
+
+```{python}
+import altair as alt
+import pandas as pd
+import geopandas as gpd
+from pathlib import Path
+import requests
+import numpy as np
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+"""
+IMPORT DATA
+"""
+
+# define data directory
+data_dir = Path().absolute().parent/"data"
+img_dir = Path().absolute().parent/"data"/"img"
+
+# import data
+walkability = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
+walkability.loc[:, 'geoid_tract_20'] = walkability.geoid_tract_20.astype(str)
+nation = pd.read_csv(data_dir/"cleaned_data"/"nation-joined_depression_cre_walkability.csv")
+
+# Ingest GEOJSON file of census tracts in DC and grab json
+req_dc = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+json_dc = req_dc.json()
+
+# create geopandas dataframe and add in the walkability / outcomes data
+geo_df = gpd.GeoDataFrame.from_features((json_dc))
+merged_df = geo_df.merge(walkability,
+                         how = 'left',
+                         left_on = 'GEOID',
+                         right_on='geoid_tract_20')
+
+
+
+"""
+NORMALIZE SCORES ACROSS ALL METRICS
+"""
+
+# convert the walkability score into a scale from 0 to 100 to make it more easier to interpret
+# original range 1-20
+# new desired range: 0-100
+original_range_min = 1
+original_range_max = 20
+new_range_max = 100
+new_range_min = 0 
+
+merged_df.loc[:, 'walkability_score_scaled'] = merged_df.loc[:, 'walkability_score'].apply(lambda x: ((x - original_range_min) / (original_range_max - original_range_min)) * (new_range_max - new_range_min) + new_range_min)
+nation.loc[:, 'walkability_score_scaled'] = nation.loc[:, 'walkability_score'].apply(lambda x: ((x - original_range_min) / (original_range_max - original_range_min)) * (new_range_max - new_range_min) + new_range_min)
+
+# convert the income inequality index score into a scale from 0 to 100 to make it easier to interpret
+# original range 0-1
+# new desired range: 0-100
+original_range_min = 0
+original_range_max = 1
+new_range_max = 100
+new_range_min = 0 
+
+merged_df.loc[:, 'income_inequality_gini_index'] = merged_df.loc[:, 'income_inequality_gini_index'].apply(lambda x: x if x >= 0 else np.nan)
+merged_df.loc[:, 'income_inequality_gini_index_scaled'] = merged_df.loc[:, 'income_inequality_gini_index'].apply(lambda x: ((x - original_range_min) / (original_range_max - original_range_min)) * (new_range_max - new_range_min) + new_range_min)
+nation.loc[:, 'income_inequality_gini_index'] = nation.loc[:, 'income_inequality_gini_index'].apply(lambda x: x if x >= 0 else np.nan)
+nation.loc[:, 'income_inequality_gini_index_scaled'] = nation.loc[:, 'income_inequality_gini_index'].apply(lambda x: ((x - original_range_min) / (original_range_max - original_range_min)) * (new_range_max - new_range_min) + new_range_min)
+
+
+# define columns to report
+outcomes_cols = ['walkability_score_scaled',
+                 'below_poverty_level_perc',
+                 'income_inequality_gini_index_scaled',
+                 'hs_grad_perc',
+                 'households_no_vehicle_perc']
+
+for i in outcomes_cols:
+    merged_df[i] = merged_df[i].apply(lambda x: x if x >= 0 else np.nan)
+    nation[i] = nation[i].apply(lambda x: x if x >= 0 else np.nan)
+    
+# flip metric to be percent of households with a car
+merged_df.loc[:, 'households_w_vehicle'] = 100 - merged_df['households_no_vehicle_perc']
+nation.loc[:, 'households_w_vehicle'] = 100 - nation['households_no_vehicle_perc']
+
+
+
+"""
+CLEAN COLUMN NAMES
+"""
+col_mapping = {'below_poverty_level_perc': '% Below Poverty Level',
+               'income_inequality_gini_index_scaled': 'Income Inequality Gini Score',
+               'hs_grad_perc': '% HS or Higher Degree',
+               'households_w_vehicle': '% with a Vehicle',
+               'walkability_score_scaled': 'Walkability Score',
+               'neighborhood_name': 'Neighborhood Name'}
+
+merged_df = merged_df.rename(col_mapping, axis='columns')
+
+
+"""
+RE-FORMAT DATA
+"""
+# turn the dataframe into long data so that the bar chart can be created with each outcome as a bar
+neighborhood_df = pd.melt(merged_df,
+                          id_vars = 'Neighborhood Name',
+                          value_vars = col_mapping.values())
+
+neighborhood_df = neighborhood_df.groupby(['Neighborhood Name', 'variable'])['value'].mean().reset_index()
+walk_scores = dict(zip(list(neighborhood_df[neighborhood_df.variable=='Walkability Score']['Neighborhood Name']),
+                       list(neighborhood_df[neighborhood_df.variable=='Walkability Score']['value'])
+                      ))
+neighborhood_df.loc[:, 'Walkability Score'] = neighborhood_df['Neighborhood Name'].map(walk_scores)
+
+# reformat to get the averages
+nation = nation[outcomes_cols+['households_w_vehicle']]
+nation.drop('households_no_vehicle_perc', axis='columns', inplace=True)
+nation_avg = pd.melt(nation,
+                     value_vars = [i for i in col_mapping.keys() if 'neighborhood_name' not in i])
+nation_avg = nation_avg.groupby('variable')['value'].mean().reset_index()
+
+# create cleaned column for plotting the national averages
+nation_avg['National Average'] = nation_avg['variable'].map(col_mapping)
+
+# create DC average walkability score
+neighborhood_df['dc_avg_walk'] = merged_df['Walkability Score'].mean()
+
+# add URL to the american flag icon
+nation_avg['flag_url'] = 'https://upload.wikimedia.org/wikipedia/commons/d/de/Flag_of_the_United_States.png'
+
+
+"""
+CREATE VISUALIZATION
+"""
+
+# define a click on the chloropleth map so that it can filter the bar chart
+click = alt.selection_multi(fields=['Neighborhood Name'])
+
+# create the chloropleth map
+choropleth = (alt.Chart(merged_df,
+                        title = "Walkability of DC Census Tracts"
+                       )
+              .mark_geoshape(stroke='white')
+              .transform_lookup(
+                                lookup='geoid_tract_20',
+                                from_=alt.LookupData(merged_df,
+                                                     'geoid_tract_20',
+                                                     ['Walkability Score', 'Neighborhood Name'])
+              ).encode(
+                    alt.Color('Walkability Score:Q',
+                              scale=alt.Scale(scheme='redyellowblue',
+                                              reverse=True
+                                             ),
+                              title = "DC Walkability"
+                             ),
+                    opacity=alt.condition(click,
+                                          alt.value(1),
+                                          alt.value(0.2)),
+                    tooltip=['Neighborhood Name:N', 'Walkability Score:Q'])
+              .add_selection(click)
+             )
+
+bars = (
+    alt.Chart(neighborhood_df,
+              title='Outcomes of DC Neighborhoods')
+    .mark_bar()
+    .encode(
+        x = alt.X('variable:N',
+                  axis=alt.Axis(labelAngle=-45)),
+        color = 'mean(Walkability Score):Q',
+        y = alt.Y('mean(value):Q',
+                  sort='x',
+                  scale = alt.Scale(domain = [0, 100])
+                 ),
+        tooltip = [
+                 'variable:N',
+                 'mean(value):Q'
+                ]
+    ).properties(
+        width = 200,
+        height = 300
+    ).transform_filter(click))
+
+# modify the axes and title labels
+bars.encoding.y.title = 'Avg. Value Across All Census Tracts'
+bars.encoding.x.title = 'Outcome'
+
+nation_avg_lines = (alt.Chart(nation_avg)
+                    .mark_tick(
+                        color="black",
+                        thickness=3,
+                        size=39,  # controls width of tick
+                        strokeDash=[1,2]
+                    )
+                    .encode(
+                        x = 'National Average:N',
+                        y='value:Q'
+                    ))
+
+nation_avg_img = (alt.Chart(nation_avg)
+                    .mark_image(
+                        width=15,
+                        height=15)
+                    .encode(
+                        x='National Average:N',
+                        y='value:Q',
+                        url='flag_url',
+                        tooltip = ['National Average', 'value:Q']
+                    ))
+
+# plot the two graphs together
+alt.hconcat(choropleth, (bars+nation_avg_lines+nation_avg_img))
+```
+
+
+First, we want to investigate whether walkability has an impact on other aspects of peoples' lives. This visualization vies into the data science question of whether a more walkable neighborhood leads to higher socioeconomic outcomes. One of theories behind this data science question is that a more walkable neighborhood may result in closer proximity to higher paying job opportunities. Our second theory was that the designs of walkable neighborhoods often results in higher economic activity within that neighborhood due to increased foot traffic, which might generate more business within an area.
+
+The left plot is a map of every census tract<sup>1</sup> in the District of Columbia and the color of each census tract is encoded with that tract's walkability score. Certain D.C. neighborhoods are comprised of several census tracts, depending on the population density of that neighborhood.<sup>2</sup> Hovering over each census tract will display the name of the neighborhood that it is in, as well as the walkability score for that particular census tract. The right bar graph shows several social outcomes averaged across the entire district. If you click on a certain neighborhood (which may be comprised of more than one census tract) on the map, it will then highlight that neighborhood in the map, and then update the bar graph with the corresponding social outcomes averaged across just that neighborhood. On each bar, the national averages are also displayed, marked by the image of an American flag with a horizontal line indicator as well. Hovering over each bar gives you the value of that social outcome averaged across all the census tracts in that neighborhood, and hovering over each American flag gives you the national average of that social outcome.
+
+Overall, we can see that DC is a highly walkable city, especially in comparison to the rest of the United States. In fact, it has almost double the walkability score as the national average. Accompanying that fact, we see that far fewer households in DC have vehicles in comparison to the national average. Interestingly, we see that DC fares about average for the social outcomes reported on. We that the most walkable parts of the city are concentrated in the city center around downtown, and as one ventures out from the city center the walkability decreases. An interesting finding is that although all edges of the city decrease in walkability, we see that the topmost edges of the city (wards 3 and 4) increase in car ownership, have very low rates of poverty, and higher high school education attainment. The lower edges of the city (wards 7 and 8) have lower walkability scores but still have lower rates of car ownership, higher poverty, and lower high school degree attainment (in comparison with wards 3 and 4). This logically suggests that car ownership is a key factor in economic success in less walkabile areas. In contrast, we see that in highly walkable neighborhoods such as Logan Circle / Shaw, it has significantly lower car ownership even in comparison to the DC average, yet has lower rates of poverty, and higher rates of high school degree attainment . 
+
+<sup>1</sup> A census tract is a geographic region defined for the purpose of taking a census. There are 179 census tracts in Washington, D.C.
+<sup>2</sup> Census tracts generally have a population size between 1,200 and 8,000 people, with an optimum size of 4,000 people. A census tract usually covers a contiguous area; however, the spatial size of census tracts varies widely depending on the density of settlement.
+
+
+## 2. How is walkability associated with health outcomes in Washington, D.C.?
+```{python}
+# IMPORT RELEVANT LIBRARIES
+import numpy as np
+import pandas as pd
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.offline as pyo
+import numpy as np
+import json
+import requests
+import numpy as np
+import scipy.stats
+import plotly.subplots as sp
+from pathlib import Path
+
+# import the csv
+dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
+
+# filter for where StateAbbr = DC
+dc_health_df = dc_health_df[dc_health_df['StateAbbr'] == 'DC']
+
+# Resetting defaults and import plotly libraries
+import plotly.io as pio
+pio.renderers.default = "browser"
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"
+import statsmodels.api as sm
+import numpy as np
+from sklearn.metrics import r2_score
+
+
+# isolate only columns with CrudePrev in the name
+dc_health_df_prev = dc_health_df.filter(regex='CrudePrev')
+df = dc_health_df_prev
+
+# Rename columns
+df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insurance', 
+                        'ARTHRITIS_CrudePrev': '% of Adults with Arthritis', 
+                        'BINGE_CrudePrev': '% of Adults who Binge Drink',
+                        'BPHIGH_CrudePrev': '% of Adults with High Blood Pressure',
+                        'BPMED_CrudePrev': '% of Adults with High Blood Pressure who take Blood Pressure Medication',
+                        'CANCER_CrudePrev': '% of Adults who were Diagnosed with Cancer',
+                        'CASTHMA_CrudePrev': '% of Adults who were Diagnosed with Asthma',
+                        'CERVICAL_CrudePrev': '% of Women who had a Pap Smear in the Past 3 Years',
+                        'CHD_CrudePrev': '% of Adults who were Diagnosed with Coronary Heart Disease',
+                        'CHECKUP_CrudePrev': '% of Adults who had a Routine Checkup in the Past Year',
+                        'CHOLSCREEN_CrudePrev': '% of Adults who had Cholesterol Checked in the Past 5 Years',
+                        'COLON_SCREEN_CrudePrev': '% of Adults who had a Colonoscopy or similar test in the Past 10 Years',
+                        'COPD_CrudePrev': '% of Adults who were Diagnosed with COPD (Chronic Obstructive Pulmonary Disease)',
+                        'COREM_CrudePrev': '% Prevalence of Older Adult Men aged >=65 years who are up to date on preventative health',
+                        'COREW_CrudePrev': '% Prevalence of Older Adult Women aged >=65 years who are up to date on preventative health',
+                        'CSMOKING_CrudePrev': '% of Adults who Currently Smoke',
+                        'DENTAL_CrudePrev': '% of Adults who had a Dental Visit in the Past Year',
+                        'DEPRESSION_CrudePrev': '% of Adults who were Diagnosed with Depression',
+                        'DIABETES_CrudePrev': '% of Adults who were Diagnosed with Diabetes',
+                        'GHLTH_CrudePrev': '% of Adults who reported their Health as not Good',
+                        'HIGHCHOL_CrudePrev': '% of Adults who were Diagnosed with High Cholesterol',
+                        'KIDNEY_CrudePrev': '% of Adults who were Diagnosed with Kidney Disease',
+                        'LPA_CrudePrev': '% of Adults who are Physically Inactive', 
+                        'MAMMOUSE_CrudePrev': '% Women aged 50-74 years who had a Mammogram in the Past 2 Years',
+                        'MHLTH_CrudePrev': '% of Adults who reported their Mental Health as not Good',
+                        'OBESITY_CrudePrev': '% of Adults who were Obese',
+                        'PHLTH_CrudePrev': '% of Adults who reported their Physical Health as not Good',
+                        'SLEEP_CrudePrev': '% of Adults who reported their Sleep as not Good',
+                        'STROKE_CrudePrev': '% of Adults who were Diagnosed with Stroke',
+                        'TEETHLOST_CrudePrev': '% of Adults who have lost all of their Natural Teeth'})
+
+# list of health metrics for drop down menu
+column_names = df.columns
+
+# Creating the initial scatter plot
+fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
+
+for col in column_names:
+    for col2 in column_names:
+        x = df[col]
+        y = df[col2]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name=col + ' vs ' + col2, showlegend=False, visible=False))
+
+
+# Update the visibility of the traces
+        
+
+def update_visibility(selected_col, selected_col2):
+    for i, trace in enumerate(fig.data):
+        if trace.name == selected_col + ' vs ' + selected_col2:
+            trace.visible = True
+        elif trace.name == selected_col + ' vs ' + selected_col2 + ' Best Fit':
+            trace.visible = True
+        else:
+            trace.visible = False
+
+# Create the drop-down menus for x (col) and y (col2) axes of the scatter plot
+col_dropdown = [{'label': col, 'value': col} for col in column_names]
+col2_dropdown = [{'label': col2, 'value': col2} for col2 in column_names]
+
+# #Define the dropdown menu for x-axis
+button_layer_1_height = 1.08
+x_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([dict(args=[{'x': [df[col]]}, update_visibility(col, col2)], label=col, method='update') for col in column_names]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height + 0.05,
+    yanchor="top"
+)
+
+
+
+# Define the dropdown menu for y-axis
+y_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([dict(args=[{'y': [df[col2]]}, update_visibility(col, col2)], label=col2, method='update') for col2 in column_names]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height,
+    yanchor="top"
+)
+
+
+
+
+# Update the layout to include the dropdown menus
+fig.update_layout(
+    updatemenus=[x_axis_dropdown, y_axis_dropdown]
+)
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
+
+# Update plot sizing
+fig.update_layout(
+    width=900,
+    height=900,
+    autosize=False,
+    #margin=dict(t=100, b=0, l=0, r=0),
+)
+
+# add annotations
+fig.update_layout(
+    annotations=[
+        dict(
+            text="X Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height + 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        ),
+        dict(
+            text="Y Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height - 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        )
+    ]
+)
+
+
+# Change background color to grey
+fig.update_layout(
+    plot_bgcolor='rgb(230, 230, 230)'
+)
+
+# Change scatter point color to red
+fig.update_traces(
+    marker=dict(color='red')
+)
+
+# Change font to Calibri
+fig.update_layout(
+    font=dict(family='Proxima Nova')
+)
+
+# # # Create a function to update the visibility of the traces based on selected columns
+# def update_visibility(selected_col, selected_col2):
+#     for i, trace in enumerate(fig.data):
+#         trace.visible = (trace.name == selected_col + ' vs ' + selected_col2)
+#         trace.visible = (trace.name == selected_col + ' vs ' + selected_col2 + ' Best Fit')
+
+
+
+
+# Display the scatter plot with dropdown menus
+fig.show()
+
+# Import walkability data
+
+df_walk = pd.read_csv('./joined_depression_cre_walkability.csv')
+dc_health_df.rename(columns={'TractFIPS': 'census_tract'}, inplace=True)
+df_walk.rename(columns={'geoid_tract_20': 'census_tract'}, inplace=True)
+# Merge the two dataframes
+df_merged = pd.merge(dc_health_df, df_walk, on='census_tract', how='left')
+
+# Resetting defaults and import plotly libraries
+import plotly.io as pio
+pio.renderers.default = "browser"
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"
+
+# isolate only columns with CrudePrev in the name
+dc_health_df_prev = df_merged.filter(regex='CrudePrev')
+# add the walkability_score column back in
+dc_health_df_prev['walkability_score'] = df_merged['walkability_score']
+df = dc_health_df_prev
+
+# Rename columns
+df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insurance', 
+                        'ARTHRITIS_CrudePrev': '% of Adults with Arthritis', 
+                        'BINGE_CrudePrev': '% of Adults who Binge Drink',
+                        'BPHIGH_CrudePrev': '% of Adults with High Blood Pressure',
+                        'BPMED_CrudePrev': '% of Adults with High Blood Pressure who take Blood Pressure Medication',
+                        'CANCER_CrudePrev': '% of Adults who were Diagnosed with Cancer',
+                        'CASTHMA_CrudePrev': '% of Adults who were Diagnosed with Asthma',
+                        'CERVICAL_CrudePrev': '% of Women who had a Pap Smear in the Past 3 Years',
+                        'CHD_CrudePrev': '% of Adults who were Diagnosed with Coronary Heart Disease',
+                        'CHECKUP_CrudePrev': '% of Adults who had a Routine Checkup in the Past Year',
+                        'CHOLSCREEN_CrudePrev': '% of Adults who had Cholesterol Checked in the Past 5 Years',
+                        'COLON_SCREEN_CrudePrev': '% of Adults who had a Colonoscopy or similar test in the Past 10 Years',
+                        'COPD_CrudePrev': '% of Adults who were Diagnosed with COPD (Chronic Obstructive Pulmonary Disease)',
+                        'COREM_CrudePrev': '% Prevalence of Older Adult Men aged >=65 years who are up to date on preventative health',
+                        'COREW_CrudePrev': '% Prevalence of Older Adult Women aged >=65 years who are up to date on preventative health',
+                        'CSMOKING_CrudePrev': '% of Adults who Currently Smoke',
+                        'DENTAL_CrudePrev': '% of Adults who had a Dental Visit in the Past Year',
+                        'DEPRESSION_CrudePrev': '% of Adults who were Diagnosed with Depression',
+                        'DIABETES_CrudePrev': '% of Adults who were Diagnosed with Diabetes',
+                        'GHLTH_CrudePrev': '% of Adults who reported their Health as not Good',
+                        'HIGHCHOL_CrudePrev': '% of Adults who were Diagnosed with High Cholesterol',
+                        'KIDNEY_CrudePrev': '% of Adults who were Diagnosed with Kidney Disease',
+                        'LPA_CrudePrev': '% of Adults who are Physically Inactive', 
+                        'MAMMOUSE_CrudePrev': '% Women aged 50-74 years who had a Mammogram in the Past 2 Years',
+                        'MHLTH_CrudePrev': '% of Adults who reported their Mental Health as not Good',
+                        'OBESITY_CrudePrev': '% of Adults who were Obese',
+                        'PHLTH_CrudePrev': '% of Adults who reported their Physical Health as not Good',
+                        'SLEEP_CrudePrev': '% of Adults who reported their Sleep as not Good',
+                        'STROKE_CrudePrev': '% of Adults who were Diagnosed with Stroke',
+                        'TEETHLOST_CrudePrev': '% of Adults who have lost all of their Natural Teeth'})
+
+# list of health metrics for drop down menu
+column_names = df.columns
+
+# Creating the initial scatter plot
+fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
+
+# Label axes
+fig.update_xaxes(title_text='Walkability Score')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+#fig.update_xaxes(range=[0, 100])
+fig.update_xaxes(range=[0, max(df['walkability_score'])])
+fig.update_yaxes(range=[0, 100])
+
+for col in column_names:
+    fig.add_trace(go.Scatter(x=df['walkability_score'], y=df[col], mode='markers', name='Walkability vs ' + col, visible=False))
+
+
+def update_visibility(selected_col, selected_col2):
+    return [(trace.name == selected_col + ' vs ' + selected_col2) for trace in fig.data]
+
+
+# Create the drop-down menus for x (col) and y (col2) axes of the scatter plot
+col_dropdown = [{'label': col, 'value': col} for col in column_names]
+
+# Define the dropdown menu for x-axis
+button_layer_1_height = 1.08
+
+y_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([
+        dict(
+            args=[
+                {"y": [df[col]], "visible": [(trace.name == "Walkability vs " + col) for trace in fig.data]}
+            ],
+            label=col,
+            method="update",
+        ) for col in column_names
+    ]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height,
+    yanchor="top"
+)
+
+
+
+
+# Update the layout to include the dropdown menus
+fig.update_layout(
+    updatemenus=[y_axis_dropdown]
+)
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+
+
+# Update plot sizing
+fig.update_layout(
+    width=900,
+    height=900,
+    autosize=False,
+    #margin=dict(t=100, b=0, l=0, r=0),
+)
+
+# add annotations
+fig.update_layout(
+    annotations=[
+        dict(
+            text="X Axis: Walkability Score of the Neighborhood",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height + 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        ),
+        dict(
+            text="Y Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height - 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        )
+    ]
+)
+
+
+def update_visibility(selected_col, selected_col2):
+    return [(trace.name == selected_col + ' vs ' + selected_col2) for trace in fig.data]
+
+
+# Change background color to grey
+fig.update_layout(
+    plot_bgcolor='rgb(230, 230, 230)'
+)
+
+# Change scatter point color to red
+fig.update_traces(
+    marker=dict(color='red')
+)
+
+# Change font to Calibri
+fig.update_layout(
+    font=dict(family='Proxima Nova')
+)
+
+
+# Display the scatter plot with dropdown menus
+fig.show()
+```
+
+After examining the relationship between walkability and socioeconomic outcomes, we wanted to investigate the relationship between walkability and health outcomes as well. In the graph above, we can see that on the x-axis we have walkability score and on the y-axis we have the selected health metric. The data is presented at the neighborhood level; in other words, each data point on the scatter plot represents a neighborhood in Washington, D.C. as defined by U.S. Census Tract data. 
+
+Upon exploring the different health metrics, we can see that neighborhoods with low walkability fare worse at many health metrics, such as percentage of adults who lost all their adult teeth and percentage of adults who are physically inactive. This makes sense because lower walkability makes it harder to be physically active. In addition, oral health is correlated to diverse health outcomes including oral health. However, there are interactions between health outcomes, such as the impact of poor oral health on physical activity, that might not point to a straightforward causal relationship between walkability and a particular health outcome.[^1] We can reference the first graph that shows the relationship between pairs of health metrics to understand interactions between health metrics more. 
+
+[^1]: [Heliyon 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182722/#:~:text=Oral%20health%20problems%20might%20lead,17%2C%2018%2C%2027%5D.)
+
+
+## 3. How accessible are neighborhoods in Washington, D.C. by bike?
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+import plotly.graph_objects as go
+from vega_datasets import data
+import requests
+import json
+import warnings
+warnings.filterwarnings('ignore')
+
+# Read in data
+bikeshare_df = pd.read_csv('../../data/202303-capitalbikeshare-tripdata.csv')
+
+# Convert dates into datetime format
+bikeshare_df['started_at'] = pd.to_datetime(bikeshare_df['started_at'])
+bikeshare_df['ended_at'] = pd.to_datetime(bikeshare_df['ended_at'])
+
+# Drop rides with NaN values
+bikeshare_df.dropna(subset=['start_station_name'], inplace = True)
+bikeshare_df.dropna(subset=['end_station_name'], inplace = True)
+
+# Standardize longitude and latitude using start station
+bikeshare_df['start_lng'] = bikeshare_df['start_lng'].groupby(bikeshare_df['start_station_id']).transform('max')
+bikeshare_df['start_lat'] = bikeshare_df['start_lat'].groupby(bikeshare_df['start_station_id']).transform('max')
+
+# Create dataframe for joining
+tmp = bikeshare_df[['start_station_id', 'start_lng','start_lat']]
+tmp.drop_duplicates(inplace = True)
+
+# Merge using the common station id value
+bikeshare_df = bikeshare_df.merge(tmp, left_on = 'end_station_id', right_on = 'start_station_id')
+
+# Drop repeated columns and rename them
+bikeshare_df.drop(columns = ['end_lat', 'end_lng', 'start_station_id_y'], inplace = True)
+bikeshare_df.rename(columns = {'start_lat_x': 'start_lat', 'start_lng_x': 'start_lng', 'start_lat_y': 'end_lat', 'start_lng_y':'end_lng', 'start_station_id_x': 'start_station_id'}, inplace = True)
+
+# Create list of bikeshare stations outside of DC
+nondc_stations = [
+    32256,32251,32237,32241,32210,32225,32259,32223,32209,32240,32239,32245,32220,32214,32219,
+    32224,32217,32213,32239,32246,32247,32250,32248,32246,32228,32215,32238,32252,32249,32260,
+    32234,32231,32235,32255,32200,32208,32201,32211,32227,32207,32229,32221,32206,32233,32205,
+    32204,32205,32203,32206,32222,32230,32232,32600,32602,32603,32608,32605,32604,32607,32609,
+    31948,31904,32606,32601,31921,31905,31902,31901,31976,31036,31977,31900,31920,31049,31037,
+    31926,31919,31035,31973,31069,31023,31022,31021,31019,31020,31094,31092,31079,31030,31029,
+    31080,31093,31014,31062,31077,31073,31024,31040,31028,31017,31924,31027,31947,31066,31075,
+    31949,31053,31971,31067,31058,31923,31063,31068,31951,31945,31095,31006,31005,31091,31004,
+    31936,31071,31090,31950,31064,31935,31011,31012,31009,31944,31052,31010,31959,31916,31088,
+    31960,31956,31910,31083,31915,31087,31085,31913,31915,31970,31969,31906,31098,31048,31081,
+    31084,31082,31974,31930,31932,31953,31942,31967,32406,32423,32415,32407,32405,32401,32400,
+    32405,32404,32413,32418,32410,32403,32408,32421,32402,32417,32422,32420,32414,32412,32416,
+    32059,32061,32026,32011,32049,32082,32058,32025,32001,32058,32082,32024,32043,32036,32012,
+    32034,32035,32050,32056,32426,32425,32424,32426,32085,32094,32089,32093,32091,32090,32087,
+    32088,32086,32092,32022,32066,32064,32062,32065,32073,32063,32084,32054,32051,32040,32046,
+    32029,32055,32002,32021,32003,32048,32013,32000,32008,32028,32027,32053,32039,32057,32078,
+    32075,32077,32076,32079,32080,32074,32081,32032,32047,32044,32017,32007,32009,32023,32033,
+    32016,32004,32005,32072,32041,32052,32071,32038,32037,32045,32067,32069,32068,32018,32253,
+    32236,32243,32258,32216,32212,32218,32019,32411,31929,31914,31907,31903,31958,31933,31041,
+    31042,31968,31044,31045,31955,31046,31047,31099,31043,31097,31931,31918,31086,31927,31966,
+    21943,31963,31952,31964,31962,31908,31072,31941,31961,31928,31054,31033,31059,31057,31061,
+    31056,31055,31909,31912,31065,31032,31074,31078,32419,31957,31954,31946,31972,31060,31938,
+    31013,31002,31007,31000,31003,31096,31070,31039,31034,31025,31038,31026,31050,31940,31089,
+    31031,31051,31937,31016,31018,31039,31015,31917,31076,31939,32409
+]
+
+# Remove limit for Altair
+alt.data_transformers.enable('default', max_rows = None)
+
+#### BACKGROUND FOR DC MAP 
+
+# Define background of Washington D.C.
+response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+
+background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bike Lanes, Capital Bikeshare Stations, & Routes in March 2023").mark_geoshape(
+        fill="lightgray",
+        stroke='white',
+        strokeWidth=1
+    ).encode(
+    ).properties(
+        width=600,
+        height=600
+    )
+
+#### BACKGROUND FOR DC BIKE LANE LOCATIONS 
+
+# Open GeoJSON file for bicycle lanes
+with open('../data/Bicycle_Lanes.geojson') as f:
+    data = json.load(f)
+
+
+# Create background of D.C.
+background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
+        stroke='#d6a320',
+        strokeWidth=1
+        ).properties(
+        width=600,
+        height=600
+    )
+
+
+
+#### MOUSEOVER SELECTION
+
+# Create mouseover selection
+select_station = alt.selection_single(
+    on="mouseover", nearest=True, fields=["start_station_name"], empty='none'
+)
+
+#### NETWORK CONNECTIONS FOR MAP 
+
+# Filter non-DC stations
+tmp1 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
+tmp1 = tmp1[~tmp1['end_station_id'].isin(nondc_stations)]
+
+# Keep only relevant columns and drop duplicates to have one row per route
+tmp1 = tmp1[['start_station_name', 'start_station_id', 'end_station_name', 'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng']].drop_duplicates()
+
+# Define connections
+connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
+    latitude="start_lat:Q",
+    longitude="start_lng:Q",
+    latitude2="end_lat:Q",
+    longitude2="end_lng:Q"
+).transform_filter(
+    select_station
+)
+
+#### POINTS FOR MAP 
+
+# Filter non-DC stations
+tmp2 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
+tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
+
+# Temporary dataframe showing unique station locations with ride count
+tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
+tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+tmp2['color'] = 'Bike Station'
+
+points = alt.Chart(tmp2).mark_circle().encode(
+    latitude="start_lat:Q",
+    longitude="start_lng:Q",
+    color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
+    size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
+    order=alt.Order("count_rides:Q", sort="descending"),
+    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
+             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
+             alt.Tooltip('count_rides:Q', title='Ride Count')
+             ]
+).add_selection(
+    select_station
+)
+
+
+# Show visualization
+(background + background_lanes + connections + points).configure_view(stroke=None)
+```
+
+Following our exploration of the relationship between a neighborhood's walkability score and its socioeconomic and health outcomes, we wanted to explore another dimension of walkability - ease of access of bikes. To do this, we explored the distribution of Capital Bikeshare stations and bike lanes across Washington, D.C.. 
+
+Capital Bikeshare is a bikeshare system that services the D.C. metro area in collaboration with the D.C. government and surrounding jurisdictions (e.g., Arlington VA, Alexandria VA, Montgomery County MD, etc.). It launched in 2010 and has since expanded to have over 600 stations and 5,000 bikes. Bikes from the network are docked at the various stations and can be used by anyone in the city at any time for a low cost[^1]. Capital Bikeshare is one of the largest bikesharing systems in the country and contributes to the D.C. Government Department of Transportation's commitment to improve bicycle access throughout the city, reduce car dependency, and encourage bicycle use for work, tourism, and more[^2]. Bike lanes throughout the city are equally important because they allow bicyclists to safely travel on bike throughout the city. Each year, on average, there are approximately 265 bicycle crashes reported in the D.C.[^3]. To increase public safety on bikes, the city has created over 100 miles of bike lanes since 2001 and has committed to building 20 additional miles by 2023[^4]. Since bike lanes and the Capital Bikeshare program are two major initiatives for improving quality of life and transportation access in D.C., our team decided to analyze data from both programs together. We created the following questions to help guide our development of a visual plot:
+
+- Where are the Capital Bikeshare stations and bike lanes located? Are they concentrated in any area in particular?
+- What Capital Bikeshare stations are the most popular? Which ones are the least popular?
+- What are some improvements the city can make to make Capital Bikeshare more accessible to inidviduals of all socio-economic backgrounds? 
+- Where should the city make new bike lanes?
+
+At first glance, it becomes apparent that the majority of Capital Bikeshare stations are concentrated near downtown. As a result, the size of these stations are larger, which indicates more trips are done from these stations. Similarly, majority of the bike lanes are located mostly in downtown and follow streets that lead toward downtown. The suburb areas within D.C., such as Tenleytown, Cleveland Park, Takoma Park, and Anacostia tend to have sparse bike share stations and even less bike lanes.
+
+The trends highlighted by our visual plot indicate that the D.C. Department of Transportation prioritized getting to and from the downtown area when creating bikeshare stations and bike lanes. While this is ideal for tourists spending a day in downtown or commuters getting to work in downtown, there are some limitations with this architecture. First, the lack of stations and bike lanes outside of downtown means that individuals outside of downtown have less access to transit via bicycles. This means that individuals have to rely mostly on cars, which may be unaffordable to those with lower incomes, or public transit (e.g., bus or metro). Additionally, individuals looking to travel from suburb neighborhood to suburb neighborhood (i.e., not travel to downtown) are not able to safely do it via bike. This is evident in our visualization when a user highlights over any station and sees that the routes almost always lead toward stations in downtown and hardly ever lead to neighboring areas. If a person wants to bike from Tenleytown to Takoma, for instance, there are no bike lanes across surrounding neighborhoods to safely do this.
+
+Our visualization highlights that while D.C. has come a long way in providing bikeshare and bike lane access, improvements can be made by creating bike stations and bike lanes across adjacent neighborhoods. With these improvements, individuals from all backgrounds looking to enjoy what D.C. has to offer outside of just downtown will one day be able to this with a bike!
+
+[^1]: [Capital Bike Share History](https://ride.capitalbikeshare.com/about)
+[^2]: [D.C. Department of Transportation Capital Bikeshare](https://ddot.dc.gov/page/capital-bikeshare)
+[^3]: [D.C. Department of Transportation Bicycle Program](https://ddot.dc.gov/page/bicycle-program)
+[^4]: [D.C. Department of Transportation Bike Lanes](https://ddot.dc.gov/page/bicycle-lanes)
+
+
+## 4. What is public sentiment around walkability in Washington, D.C.? 
+
+Following the above analysis, we wanted to gauge public sentiment around walkability in Washington, D.C. to see if that sheds light on our quantitative findings. We first want to observe the most frequent words accross categories. Sentiment analysis of user comments is a crucial tool for comprehending socially relevant issues like transportation and walkability of cities, which can help guide decisions that improve the quality of life for locals, workers, and visitors alike. By analyzing the sentiment of user opinions, we can gain a deeper understanding of how people feel about these factors and how they impact their ability and willingness to transit in a particular city. For instance, sentiment analysis can show whether people feel safe walking through particular neighborhoods or whether they find it simple to get to bike lanes or public transportation. Additionally, sentiment analysis can be used to find neighborhoods that are more walkable for particular groups of people or where certain amenities are lacking, as well as places where there are disparities in walkability. Cities can work to build more equitable and inclusive communities by addressing these disparities. In this work we gathered reddit user's opinions for different transportation and walkability topics in D.C. the topics are related to vehicles, bicycle and walkability.
+
+We first want to observe the most frequent words accross categories. 
+
+!["wordcloud"](..\img\wordcloud.png)
+
+From this information we can see the word "metro" as a transportation method being mentioned while commenting on cars, to have a better understanding of the opinions we predicted the sentiment as "positive" "negative" or "neutral.
+
+By analyzing the sentiment of each category we can see bike's polarity median is higher than walk and car. Walk median and values are closer to the neutral value of 0 although its q3 value is slightly up in the positive range. On the other hand the car category is below the neutral point having it's median in -.26 and its q3 value is closer to the median meaning most comments are under the neutral range and some are closer to it. Interestingly, all values are ranging from -1 to 1, which means that there are fully positive and negative comments across all categories.
+
+```{python}
+import pandas as pd
+import re
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import tensorflow as tf
+import pandas as pd
+import random
+import numpy as np
+import torch as torch
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+import json
+
+#opening previously modified sentiment analysis
+b_sent = pd.read_csv("../data/bikes_sent.csv")
+c_sent = pd.read_csv("../data/cars_sent.csv")
+w_sent = pd.read_csv("../data/walk_sent.csv")
+
+# drop index
+b_sent = b_sent.drop(columns=['Unnamed: 0'])
+c_sent = c_sent.drop(columns=['Unnamed: 0'])
+w_sent = w_sent.drop(columns=['Unnamed: 0'])
+
+# add category
+b_sent["category"] = "bike"
+c_sent["category"] = "car"
+w_sent["category"] = "walk"
+
+b_sent = b_sent.rename(columns={"bikes": "text"})
+c_sent = c_sent.rename(columns={"cars": "text"})
+w_sent = w_sent.rename(columns={"walk": "text"})
+
+#generate a single dataframe
+df_sent = b_sent.append([c_sent,w_sent], ignore_index = True)
+
+#obtain polarity as a range of negative, neutral and positives
+polarity = []
+for i in range(len(df_sent["label"])):
+    if df_sent["POS"][i] > df_sent["NEG"][i]:
+        polarity.append(df_sent["POS"][i])
+    elif df_sent["POS"][i] < df_sent["NEG"][i]:
+        polarity.append(df_sent["NEG"][i]*-1)
+
+df_sent["polarity"] = polarity
+
+y0 = df_sent.loc[df_sent['category'] == 'bike']['polarity']
+y1 = df_sent.loc[df_sent['category'] == 'walk']['polarity']
+y2 = df_sent.loc[df_sent['category'] == 'car']['polarity']
+
+trace0 = go.Box(
+    y=y0,
+    name = 'bike',
+    marker = dict(
+        color = 'rgba(148, 46, 46, 0.784)',
+    ),
+    notched=True
+)
+trace1 = go.Box(
+    y=y1,
+    name = 'walk',
+    marker = dict(
+        color = 'rgb(153, 91, 40)',
+    ),
+    notched=True
+)
+trace2 = go.Box(
+    y=y2,
+    name = 'car',
+    marker = dict(
+        color = 'rgb(214, 163, 32)',
+    ),
+    notched=True
+)
+
+data = [trace0, trace1, trace2]
+layout = go.Layout(
+    title = "Sentiment polarity boxplot by category"
+)
+
+fig = go.Figure(data=data,layout=layout)
+iplot(fig, filename = "Sentiment polarity boxplot by category")
+```
+
+```{python}
+trace1 = go.Scatter(
+    x=df_sent['polarity'], y=df_sent['category'], mode='markers', name='points',
+    marker=dict(color='rgb(102,0,0)', size=2, opacity=0.4)
+)
+trace2 = go.Histogram2dContour(
+    x=df_sent['polarity'], y=df_sent['category'], name='density', ncontours=30,
+    colorscale='Hot', reversescale=True, showscale=False,
+    hovertemplate='<br>Polarity: %{x}<br>Category: %{y}<br>Comments: %{z}'
+)
+trace3 = go.Histogram(
+    x=df_sent['polarity'], name='Polarity',
+    marker=dict(color='rgb(214, 163, 32)'),
+    yaxis='y2',
+    hovertemplate='<br>%{x}<br>'
+)
+trace4 = go.Histogram(
+    y=df_sent['category'], name='Category', marker=dict(color='rgba(148, 46, 46, 0.784)'),
+    xaxis='x2'
+)
+data = [trace1, trace2, trace3, trace4]
+
+layout = go.Layout(
+    showlegend=False,
+    autosize=False,
+    width=800,
+    height=750,
+    xaxis=dict(
+        domain=[0, 0.85],
+        showgrid=False,
+        zeroline=False
+    ),
+    yaxis=dict(
+        domain=[0, 0.85],
+        showgrid=False,
+        zeroline=False
+    ),
+    margin=dict(
+        t=50
+    ),
+    hovermode='closest',
+    bargap=0,
+    xaxis2=dict(
+        domain=[0.85, 1],
+        showgrid=False,
+        zeroline=False
+    ),
+    yaxis2=dict(
+        domain=[0.85, 1],
+        showgrid=False,
+        zeroline=False
+    )
+)
+
+fig = go.Figure(data=data, layout=layout)
+fig.update_layout(yaxis_title="Category",xaxis_title="Polarity", title="Sentiment polarity of posts by category") 
+
+iplot(fig, filename='2dhistogram-2d-density-plot-subplots')
+```
+
+Due to the uneven number of comments about walking in comparison to the other categories, the density plot and histograms provide more meaningful insight into trends. In the "walk" category, we observe that there is a high concentration of comments (382) in the highest positive polarity section. This is intriguing because even though the walk category gas a huge number of comments in the neutral range, most of the comments are concentrated in the most positive section. It is also interesting to note the density of neutral-negative and fully negative values in the same category. It is important to note that we gathered threads that were related to that category, so having negative comments does not necessarily mean a negative opinion towards the category itself. For example a user saying "I hate that the walkability in D.C. is almost null" is very different from "I hate walkability", though both lines contain the negative words "hate" and "walkability".
+
+On the other hand, we see a low density of positive opinions for cars, and almost no comments in the neutral-positve range. From the histogram plot at the right we can observe that although the bike category has the smallest number of opinons we can see that it has more positive comments than cars.
+
+Finally, to better represent the observed sentiments we will observe the most frequent pair of words by category in the bigrams below. One of the biggest trends among these bigrams are the pair of words for referring to popular spaces in D.C. such as Florida Avenue, Adams Morgan, Columbia Heights. The frequencies at which these pairs appear by category are interesting: bike bigrams focus on specific avenues and intersections, such as blocks and avenues; the car category has frequent mentions of suburbs such as Maryland and Virginia; and the walk category has frequent mentions of parks, museums and monuments related to positive adjectives such as beautiful. The findings in this analysis highlight the relationship between driving towards suburbs in D.C. and walking/biking towards more touristic places. On the other hand, negative bigrams, such as "pedestrian death" and "rush hour traffic camera," should be considered as repetitive words in the comments, along with other serious opinions like "traffic safety." The walkability category also contains negative bigrams like "sucks" and "unsafe," as well as combinations like "better infrastructure," "poor person," and "homeless people," which require attention.
+ 
+!["a"](..\img\bigrams_network.png)
+ 
+In conclusion, we can see that people's attitudes toward different types of transportation in DC vary based on the insights obtained from sentiment analysis and visualizations. Although people tend to comment on bicycles more favorably than on walking or driving, all categories also draw criticism. The analysis of the pairs of words additionally sheds light on how different types of transportation relate to multiple parts of the city. For instance, while bigrams related to cars refer to suburbs like Maryland and Virginia, bigrams related to bikes concentrate on specific streets and blocks. While biking and walking are associated with more popular destinations like parks, museums, and monuments. Urban planners and policymakers may find this information helpful in understanding how various modes of transportation are used and in making decisions about urban planning and transportation infrastructure. It's interesting to note that the positive comments for the walk category are concentrated around a few popular neighborhoods and landmarks in Washington, DC, indicating that the perception of the city's walkability may be influenced by the presence of popular destinations. Furthermore, the negative bigrams associated with automobiles, such as pedestrian fatalities and traffic safety, indicate that there are significant issues that require attention in order to increase safety and accessibility. To conclude this section, we wanted to highlight a particularly eloquent Reddit comment on the walkability gap in Washington, D.C.:
+
+*"I often times see "making DC a better place to live", but the question I ask often is "for who?". For those making enough to live in the inner-most part of the city? How do lower/working class individuals work, live, and enjoy this same city when the commute to do so.. is becoming unmanageable?"*
+
+## Conclusion
+
+Overall, we explored the ease of access in various neighborhoods by foot and by bike, the correlation of walkability to socioeconomic and health outcomes, and sentiment around walkability in Washington, D.C. First, we see that walkability is associated with mixed socioeconomic outcomes, based on geographic area: while all outer parts of Washington, D.C. have low walkability, the top edges have higher car ownership and socioeconomic outcomes, whereas the low edges have low car ownership and poorer socioeconomic outcomes. Second, we see that low walkability is generally associated with poorer health outcomes, which makes sense because having decreased access to walking would limit mobility and health outcomes. After examining walkability and its assocation with various outcomes, we examined bikability and noticed that there are more neighborhood-downtown bike lanes and fewer neighborhood-neighborhood bike lanes. Given that housing and spending are generally higher in downtown areas, this trend makes it more expensive and unsafe to travel between lower-income areas. Finally, we investigated public sentiment on walking, biking, and cars in Washington, D.C. and discovered that people tend to comment on bicycles more favorably than on walking or driving, all categories also draw criticism.
+
+It is important to note that various socioeconomic and health outcomes as well as walkability are interconnected and contribute to a complex web of influences on each other. Overall, our findings show that higher walkability in neighborhoods can promote physical activity, access to healthy food, and overall environmental and socioeconomic well-being, which in turn can positively impact various health metrics. If we had more time to conduct this study, we would love to explore the interactions between socioeconomic and health metrics to help us contextualize the relationship between walkability and such outcomes, so to have a better understanding of the causal and correlational relationships between these factors. For our text data, we would also further contextualize the sentiment analysis and differentiate between sentences like "I hate that walkability in Washington, D.C. is bad" and "I hate walking in Washington, D.C." to obtain more accurate findings. 
+
+As Washington, D.C. is among the most walkable cities in the US, we hope that this study can increase awareness of the importance of walkability and even inspire future initiatives in improving walkability in Washington, D.C. and other cities too. Having an equitable access to amenities like grocery stores and community health centers is vital to positive outcomes, and we hope that this study might inspire you to find ways to learn more about and promote walkability in where you live.   
 
 ## Bibliography
 
-Valeria to add citations feel free to list the resources you are using here
+# Valeria to add citations feel free to list the resources you are using here
 
-1.https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds
-2. Glaeser, E. L., and Kahn, M. E. (2004). “Sprawl and Urban Growth,” in Handbook of Regional and Urban Economics (Elsevier), 2481–2527. doi:10.1016/s1574-0080(04)80013-0
 
