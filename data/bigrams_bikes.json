@@ -1,0 +1,987 @@
+{
+    "nodes": [
+        {
+            "name": "access",
+            "n": 1,
+            "grp": 1,
+            "id": "access"
+        },
+        {
+            "name": "adams",
+            "n": 2,
+            "grp": 1,
+            "id": "adams"
+        },
+        {
+            "name": "anacostia",
+            "n": 3,
+            "grp": 1,
+            "id": "anacostia"
+        },
+        {
+            "name": "anywhere",
+            "n": 4,
+            "grp": 1,
+            "id": "anywhere"
+        },
+        {
+            "name": "ave",
+            "n": 5,
+            "grp": 1,
+            "id": "ave"
+        },
+        {
+            "name": "bicycle",
+            "n": 6,
+            "grp": 1,
+            "id": "bicycle"
+        },
+        {
+            "name": "bike",
+            "n": 7,
+            "grp": 1,
+            "id": "bike"
+        },
+        {
+            "name": "biking",
+            "n": 8,
+            "grp": 1,
+            "id": "biking"
+        },
+        {
+            "name": "branch",
+            "n": 9,
+            "grp": 1,
+            "id": "branch"
+        },
+        {
+            "name": "canal",
+            "n": 10,
+            "grp": 1,
+            "id": "canal"
+        },
+        {
+            "name": "capital",
+            "n": 11,
+            "grp": 1,
+            "id": "capital"
+        },
+        {
+            "name": "capitol",
+            "n": 12,
+            "grp": 1,
+            "id": "capitol"
+        },
+        {
+            "name": "car",
+            "n": 13,
+            "grp": 1,
+            "id": "car"
+        },
+        {
+            "name": "chain",
+            "n": 14,
+            "grp": 1,
+            "id": "chain"
+        },
+        {
+            "name": "co",
+            "n": 15,
+            "grp": 1,
+            "id": "co"
+        },
+        {
+            "name": "college",
+            "n": 16,
+            "grp": 1,
+            "id": "college"
+        },
+        {
+            "name": "columbia",
+            "n": 17,
+            "grp": 1,
+            "id": "columbia"
+        },
+        {
+            "name": "connecticut",
+            "n": 18,
+            "grp": 1,
+            "id": "connecticut"
+        },
+        {
+            "name": "county",
+            "n": 19,
+            "grp": 1,
+            "id": "county"
+        },
+        {
+            "name": "couple",
+            "n": 20,
+            "grp": 1,
+            "id": "couple"
+        },
+        {
+            "name": "creek",
+            "n": 21,
+            "grp": 1,
+            "id": "creek"
+        },
+        {
+            "name": "crescent",
+            "n": 22,
+            "grp": 1,
+            "id": "crescent"
+        },
+        {
+            "name": "distance",
+            "n": 23,
+            "grp": 1,
+            "id": "distance"
+        },
+        {
+            "name": "downtown",
+            "n": 24,
+            "grp": 1,
+            "id": "downtown"
+        },
+        {
+            "name": "east",
+            "n": 25,
+            "grp": 1,
+            "id": "east"
+        },
+        {
+            "name": "easy",
+            "n": 26,
+            "grp": 1,
+            "id": "easy"
+        },
+        {
+            "name": "end",
+            "n": 27,
+            "grp": 1,
+            "id": "end"
+        },
+        {
+            "name": "first",
+            "n": 28,
+            "grp": 1,
+            "id": "first"
+        },
+        {
+            "name": "florida",
+            "n": 29,
+            "grp": 1,
+            "id": "florida"
+        },
+        {
+            "name": "four",
+            "n": 30,
+            "grp": 1,
+            "id": "four"
+        },
+        {
+            "name": "friendly",
+            "n": 31,
+            "grp": 1,
+            "id": "friendly"
+        },
+        {
+            "name": "get",
+            "n": 32,
+            "grp": 1,
+            "id": "get"
+        },
+        {
+            "name": "good",
+            "n": 33,
+            "grp": 1,
+            "id": "good"
+        },
+        {
+            "name": "google",
+            "n": 34,
+            "grp": 1,
+            "id": "google"
+        },
+        {
+            "name": "half",
+            "n": 35,
+            "grp": 1,
+            "id": "half"
+        },
+        {
+            "name": "heights",
+            "n": 36,
+            "grp": 1,
+            "id": "heights"
+        },
+        {
+            "name": "hill",
+            "n": 37,
+            "grp": 1,
+            "id": "hill"
+        },
+        {
+            "name": "home",
+            "n": 38,
+            "grp": 1,
+            "id": "home"
+        },
+        {
+            "name": "hop",
+            "n": 39,
+            "grp": 1,
+            "id": "hop"
+        },
+        {
+            "name": "infra",
+            "n": 40,
+            "grp": 1,
+            "id": "infra"
+        },
+        {
+            "name": "infrastructure",
+            "n": 41,
+            "grp": 1,
+            "id": "infrastructure"
+        },
+        {
+            "name": "lane",
+            "n": 42,
+            "grp": 1,
+            "id": "lane"
+        },
+        {
+            "name": "lanes",
+            "n": 43,
+            "grp": 1,
+            "id": "lanes"
+        },
+        {
+            "name": "left",
+            "n": 44,
+            "grp": 1,
+            "id": "left"
+        },
+        {
+            "name": "line",
+            "n": 45,
+            "grp": 1,
+            "id": "line"
+        },
+        {
+            "name": "lock",
+            "n": 46,
+            "grp": 1,
+            "id": "lock"
+        },
+        {
+            "name": "maps",
+            "n": 47,
+            "grp": 1,
+            "id": "maps"
+        },
+        {
+            "name": "mbt",
+            "n": 48,
+            "grp": 1,
+            "id": "mbt"
+        },
+        {
+            "name": "metropolitan",
+            "n": 49,
+            "grp": 1,
+            "id": "metropolitan"
+        },
+        {
+            "name": "mile",
+            "n": 50,
+            "grp": 1,
+            "id": "mile"
+        },
+        {
+            "name": "montgomery",
+            "n": 51,
+            "grp": 1,
+            "id": "montgomery"
+        },
+        {
+            "name": "morgan",
+            "n": 52,
+            "grp": 1,
+            "id": "morgan"
+        },
+        {
+            "name": "mt",
+            "n": 53,
+            "grp": 1,
+            "id": "mt"
+        },
+        {
+            "name": "much",
+            "n": 54,
+            "grp": 1,
+            "id": "much"
+        },
+        {
+            "name": "navy",
+            "n": 55,
+            "grp": 1,
+            "id": "navy"
+        },
+        {
+            "name": "ne",
+            "n": 56,
+            "grp": 1,
+            "id": "ne"
+        },
+        {
+            "name": "new",
+            "n": 57,
+            "grp": 1,
+            "id": "new"
+        },
+        {
+            "name": "next",
+            "n": 58,
+            "grp": 1,
+            "id": "next"
+        },
+        {
+            "name": "nw",
+            "n": 59,
+            "grp": 1,
+            "id": "nw"
+        },
+        {
+            "name": "old",
+            "n": 60,
+            "grp": 1,
+            "id": "old"
+        },
+        {
+            "name": "one",
+            "n": 61,
+            "grp": 1,
+            "id": "one"
+        },
+        {
+            "name": "park",
+            "n": 62,
+            "grp": 1,
+            "id": "park"
+        },
+        {
+            "name": "place",
+            "n": 63,
+            "grp": 1,
+            "id": "place"
+        },
+        {
+            "name": "pleasant",
+            "n": 64,
+            "grp": 1,
+            "id": "pleasant"
+        },
+        {
+            "name": "potomac",
+            "n": 65,
+            "grp": 1,
+            "id": "potomac"
+        },
+        {
+            "name": "pretty",
+            "n": 66,
+            "grp": 1,
+            "id": "pretty"
+        },
+        {
+            "name": "protected",
+            "n": 67,
+            "grp": 1,
+            "id": "protected"
+        },
+        {
+            "name": "red",
+            "n": 68,
+            "grp": 1,
+            "id": "red"
+        },
+        {
+            "name": "right",
+            "n": 69,
+            "grp": 1,
+            "id": "right"
+        },
+        {
+            "name": "river",
+            "n": 70,
+            "grp": 1,
+            "id": "river"
+        },
+        {
+            "name": "rock",
+            "n": 71,
+            "grp": 1,
+            "id": "rock"
+        },
+        {
+            "name": "routes",
+            "n": 72,
+            "grp": 1,
+            "id": "routes"
+        },
+        {
+            "name": "run",
+            "n": 73,
+            "grp": 1,
+            "id": "run"
+        },
+        {
+            "name": "safer",
+            "n": 74,
+            "grp": 1,
+            "id": "safer"
+        },
+        {
+            "name": "secure",
+            "n": 75,
+            "grp": 1,
+            "id": "secure"
+        },
+        {
+            "name": "side",
+            "n": 76,
+            "grp": 1,
+            "id": "side"
+        },
+        {
+            "name": "silver",
+            "n": 77,
+            "grp": 1,
+            "id": "silver"
+        },
+        {
+            "name": "spring",
+            "n": 78,
+            "grp": 1,
+            "id": "spring"
+        },
+        {
+            "name": "st",
+            "n": 79,
+            "grp": 1,
+            "id": "st"
+        },
+        {
+            "name": "station",
+            "n": 80,
+            "grp": 1,
+            "id": "station"
+        },
+        {
+            "name": "street",
+            "n": 81,
+            "grp": 1,
+            "id": "street"
+        },
+        {
+            "name": "take",
+            "n": 82,
+            "grp": 1,
+            "id": "take"
+        },
+        {
+            "name": "th",
+            "n": 83,
+            "grp": 1,
+            "id": "th"
+        },
+        {
+            "name": "town",
+            "n": 84,
+            "grp": 1,
+            "id": "town"
+        },
+        {
+            "name": "traffic",
+            "n": 85,
+            "grp": 1,
+            "id": "traffic"
+        },
+        {
+            "name": "trail",
+            "n": 86,
+            "grp": 1,
+            "id": "trail"
+        },
+        {
+            "name": "trails",
+            "n": 87,
+            "grp": 1,
+            "id": "trails"
+        },
+        {
+            "name": "turn",
+            "n": 88,
+            "grp": 1,
+            "id": "turn"
+        },
+        {
+            "name": "u",
+            "n": 89,
+            "grp": 1,
+            "id": "u"
+        },
+        {
+            "name": "union",
+            "n": 90,
+            "grp": 1,
+            "id": "union"
+        },
+        {
+            "name": "vernon",
+            "n": 91,
+            "grp": 1,
+            "id": "vernon"
+        },
+        {
+            "name": "walking",
+            "n": 92,
+            "grp": 1,
+            "id": "walking"
+        },
+        {
+            "name": "water",
+            "n": 93,
+            "grp": 1,
+            "id": "water"
+        },
+        {
+            "name": "way",
+            "n": 94,
+            "grp": 1,
+            "id": "way"
+        },
+        {
+            "name": "ways",
+            "n": 95,
+            "grp": 1,
+            "id": "ways"
+        },
+        {
+            "name": "west",
+            "n": 96,
+            "grp": 1,
+            "id": "west"
+        },
+        {
+            "name": "within",
+            "n": 97,
+            "grp": 1,
+            "id": "within"
+        },
+        {
+            "name": "woodley",
+            "n": 98,
+            "grp": 1,
+            "id": "woodley"
+        },
+        {
+            "name": "work",
+            "n": 99,
+            "grp": 1,
+            "id": "work"
+        },
+        {
+            "name": "yard",
+            "n": 100,
+            "grp": 1,
+            "id": "yard"
+        },
+        {
+            "name": "york",
+            "n": 101,
+            "grp": 1,
+            "id": "york"
+        }
+    ],
+    "links": [
+        {
+            "source": "metropolitan",
+            "target": "branch",
+            "value": 4
+        },
+        {
+            "source": "capitol",
+            "target": "hill",
+            "value": 8
+        },
+        {
+            "source": "four",
+            "target": "mile",
+            "value": 3
+        },
+        {
+            "source": "secure",
+            "target": "place",
+            "value": 4
+        },
+        {
+            "source": "mt",
+            "target": "pleasant",
+            "value": 3
+        },
+        {
+            "source": "take",
+            "target": "lane",
+            "value": 3
+        },
+        {
+            "source": "east",
+            "target": "capitol",
+            "value": 5
+        },
+        {
+            "source": "protected",
+            "target": "bike",
+            "value": 10
+        },
+        {
+            "source": "u",
+            "target": "lock",
+            "value": 5
+        },
+        {
+            "source": "branch",
+            "target": "trail",
+            "value": 4
+        },
+        {
+            "source": "anywhere",
+            "target": "within",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "infra",
+            "value": 3
+        },
+        {
+            "source": "work",
+            "target": "downtown",
+            "value": 3
+        },
+        {
+            "source": "th",
+            "target": "st",
+            "value": 7
+        },
+        {
+            "source": "car",
+            "target": "traffic",
+            "value": 5
+        },
+        {
+            "source": "florida",
+            "target": "ave",
+            "value": 3
+        },
+        {
+            "source": "ne",
+            "target": "turn",
+            "value": 8
+        },
+        {
+            "source": "half",
+            "target": "mile",
+            "value": 4
+        },
+        {
+            "source": "old",
+            "target": "town",
+            "value": 5
+        },
+        {
+            "source": "street",
+            "target": "ne",
+            "value": 10
+        },
+        {
+            "source": "anacostia",
+            "target": "trail",
+            "value": 3
+        },
+        {
+            "source": "adams",
+            "target": "morgan",
+            "value": 4
+        },
+        {
+            "source": "west",
+            "target": "end",
+            "value": 3
+        },
+        {
+            "source": "get",
+            "target": "bike",
+            "value": 5
+        },
+        {
+            "source": "biking",
+            "target": "trails",
+            "value": 3
+        },
+        {
+            "source": "east",
+            "target": "side",
+            "value": 3
+        },
+        {
+            "source": "protected",
+            "target": "lanes",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "friendly",
+            "value": 3
+        },
+        {
+            "source": "crescent",
+            "target": "trail",
+            "value": 5
+        },
+        {
+            "source": "google",
+            "target": "maps",
+            "value": 8
+        },
+        {
+            "source": "mt",
+            "target": "vernon",
+            "value": 7
+        },
+        {
+            "source": "rock",
+            "target": "creek",
+            "value": 20
+        },
+        {
+            "source": "walking",
+            "target": "distance",
+            "value": 3
+        },
+        {
+            "source": "college",
+            "target": "park",
+            "value": 3
+        },
+        {
+            "source": "columbia",
+            "target": "heights",
+            "value": 6
+        },
+        {
+            "source": "new",
+            "target": "york",
+            "value": 3
+        },
+        {
+            "source": "hop",
+            "target": "mbt",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "trails",
+            "value": 3
+        },
+        {
+            "source": "turn",
+            "target": "left",
+            "value": 5
+        },
+        {
+            "source": "st",
+            "target": "nw",
+            "value": 3
+        },
+        {
+            "source": "red",
+            "target": "line",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "lanes",
+            "value": 23
+        },
+        {
+            "source": "silver",
+            "target": "spring",
+            "value": 9
+        },
+        {
+            "source": "easy",
+            "target": "access",
+            "value": 6
+        },
+        {
+            "source": "montgomery",
+            "target": "county",
+            "value": 4
+        },
+        {
+            "source": "water",
+            "target": "street",
+            "value": 3
+        },
+        {
+            "source": "ways",
+            "target": "get",
+            "value": 3
+        },
+        {
+            "source": "vernon",
+            "target": "trail",
+            "value": 3
+        },
+        {
+            "source": "much",
+            "target": "safer",
+            "value": 3
+        },
+        {
+            "source": "bicycle",
+            "target": "lanes",
+            "value": 5
+        },
+        {
+            "source": "potomac",
+            "target": "yard",
+            "value": 3
+        },
+        {
+            "source": "trail",
+            "target": "get",
+            "value": 3
+        },
+        {
+            "source": "one",
+            "target": "way",
+            "value": 3
+        },
+        {
+            "source": "th",
+            "target": "street",
+            "value": 6
+        },
+        {
+            "source": "chain",
+            "target": "lock",
+            "value": 3
+        },
+        {
+            "source": "pretty",
+            "target": "good",
+            "value": 5
+        },
+        {
+            "source": "turn",
+            "target": "right",
+            "value": 4
+        },
+        {
+            "source": "home",
+            "target": "work",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "routes",
+            "value": 3
+        },
+        {
+            "source": "mile",
+            "target": "run",
+            "value": 3
+        },
+        {
+            "source": "good",
+            "target": "bike",
+            "value": 4
+        },
+        {
+            "source": "anacostia",
+            "target": "river",
+            "value": 3
+        },
+        {
+            "source": "union",
+            "target": "station",
+            "value": 3
+        },
+        {
+            "source": "left",
+            "target": "th",
+            "value": 5
+        },
+        {
+            "source": "station",
+            "target": "station",
+            "value": 3
+        },
+        {
+            "source": "navy",
+            "target": "yard",
+            "value": 5
+        },
+        {
+            "source": "creek",
+            "target": "park",
+            "value": 11
+        },
+        {
+            "source": "first",
+            "target": "st",
+            "value": 3
+        },
+        {
+            "source": "next",
+            "target": "couple",
+            "value": 3
+        },
+        {
+            "source": "capital",
+            "target": "crescent",
+            "value": 8
+        },
+        {
+            "source": "connecticut",
+            "target": "ave",
+            "value": 4
+        },
+        {
+            "source": "bike",
+            "target": "infrastructure",
+            "value": 5
+        },
+        {
+            "source": "woodley",
+            "target": "park",
+            "value": 3
+        },
+        {
+            "source": "bike",
+            "target": "lane",
+            "value": 25
+        },
+        {
+            "source": "co",
+            "target": "canal",
+            "value": 4
+        }
+    ]
+}
