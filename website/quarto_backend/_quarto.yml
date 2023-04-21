@@ -21,6 +21,7 @@ website:
 
 format:
   html:
+    code-fold: true
     embed-resources: true
     theme: 
     - zephyr

@@ -260,6 +260,8 @@ import numpy as np
 import scipy.stats
 import plotly.subplots as sp
 from pathlib import Path
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # import the csv
 data_dir = Path().absolute().parent.absolute().parent/"data"
@@ -647,6 +649,7 @@ from vega_datasets import data
 import requests
 import json
 import warnings
+from pathlib import Path
 warnings.filterwarnings('ignore')
 
 # Read in data
@@ -654,7 +657,7 @@ warnings.filterwarnings('ignore')
 data_dir = Path().absolute().parent.absolute().parent/"data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
 
-bikeshare_df = pd.read_csv(data_dir/"02303-capitalbikeshare-tripdata.csv")
+bikeshare_df = pd.read_csv(data_dir/"202303-capitalbikeshare-tripdata.csv")
 
 # Convert dates into datetime format
 bikeshare_df['started_at'] = pd.to_datetime(bikeshare_df['started_at'])
@@ -707,8 +710,7 @@ nondc_stations = [
     31031,31051,31937,31016,31018,31039,31015,31917,31076,31939,32409
 ]
 
-# Remove limit for Altair
-alt.data_transformers.enable('default', max_rows = None)
+alt.data_transformers.enable('default',max_rows=None)
 
 #### BACKGROUND FOR DC MAP 
 
@@ -728,7 +730,7 @@ background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bi
 #### BACKGROUND FOR DC BIKE LANE LOCATIONS 
 
 # Open GeoJSON file for bicycle lanes
-with open('../data/Bicycle_Lanes.geojson') as f:
+with open(data_dir/'Bicycle_Lanes.geojson') as f:
     data = json.load(f)
 
 
@@ -822,11 +824,110 @@ Following the above analysis, we wanted to gauge public sentiment around walkabi
 
 We first want to observe the most frequent words across categories. 
 
-!["wordcloud"](..\img\wordcloud.png)
+```{=html}
+<script>
+  //Based on https://github.com/jasondavies/d3-cloud/blob/master/examples/simple.html
+  function wordCloud(div, width=500, height=500) {
+    var fill = d3.scale.category20();
+    var svg = d3.select(div).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
 
+    function draw(words) {
+      var cloud = svg.selectAll("g text")
+                     .data(words, function(d) { return d.text; });
+      cloud.enter()
+           .append("text")
+           .style("font-family", "Impact")
+           .style("fill", function(d, i) { return fill(i); })
+           .attr("text-anchor", "middle")
+           .attr('font-size', 1)
+           .text(function(d) { return d.text; });
+
+      //Entering and existing words
+      cloud.transition()
+           .duration(600)
+           .style("font-size", function(d) { return d.size + "px"; })
+           .attr("transform", function(d) {
+             return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+           })
+           .style("fill-opacity", 1);
+
+      //Exiting words
+      cloud.exit()
+           .transition()
+           .duration(200)
+           .style('fill-opacity', 1e-6)
+           .attr('font-size', 1)
+           .remove();
+    }
+
+    return {
+      update: function(words) {
+        d3.layout.cloud().size([width, height])
+          .words(words)
+          .padding(5)
+          .rotate(function() { return ~~(Math.random() * 2) * 90; })
+          .font("Impact")
+          .fontSize(function(d) { return d.size; })
+          .on("end", draw)
+          .start();
+      }
+    }
+  }
+
+  var myWordCloud = wordCloud('#myDiv', 500, 500);
+
+  var words = ["a b c",
+  "x y x",
+  "x y x z e"
+  ]
+
+  function getWords(i) {
+    return words[i]
+        .replace(/[!\.,:;\?]/g, '')
+        .split(' ')
+        .map(function(d) {
+            return {text: d, size: 10 + Math.random() * 60};
+        })
+  }
+
+  function showNewWords(vis, i, updateCallback) {
+      i = i || 0;
+
+      vis.update(getWords(i ++ % words.length));
+      updateCallback();
+  }
+
+  d3.select('#myButton').on('click', function() {
+      myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
+  });
+
+  myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
+
+</script>
+<div id="myDiv">
+  <button id="myButton" style= "
+  display: inline-block;
+  outline: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 12px 20px;
+  border: none;
+  transition: box-shadow 0.2s ease 0s, -ms-transform 0.1s ease 0s, -webkit-transform 0.1s ease 0s, transform 0.1s ease 0s;
+  background: linear-gradient(to right, rgba(148, 46, 46, 0.784) 0%, rgba(148, 46, 46, 0.784) 50%, rgba(148, 46, 46, 0.784) 100%);
+  color: #fff;
+">Show Word Cloud</button>
+</div>
+```
 From this information we can see the word "metro" as a transportation method being mentioned while commenting on cars, to have a better understanding of the opinions we predicted the sentiment as "positive" "negative" or "neutral.
 
-By analyzing the sentiment of each category we can see bike's polarity median is higher than walk and car. Walk median and values are closer to the neutral value of 0 although its q3 value is slightly up in the positive range. On the other hand the car category is below the neutral point having it's median in -.26 and its q3 value is closer to the median meaning most comments are under the neutral range and some are closer to it. Interestingly, all values are ranging from -1 to 1, which means that there are fully positive and negative comments across all categories.
+By analyzing the sentiment of each category we can see bike's polarity median is higher than walk and car. Walk median and values are closer to the neutral value of 0 although its Q3 value is slightly up in the positive range. On the other hand the car category is below the neutral point having it's median in -.26 and its Q3 value is closer to the median meaning most comments are under the neutral range and some are closer to it. Interestingly, all values are ranging from -1 to 1, which means that there are fully positive and negative comments across all categories.
 
 ```{python}
 import pandas as pd
@@ -842,6 +943,8 @@ import plotly.express as px
 import plotly.io as pio
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import json
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #opening previously modified sentiment analysis
 data_dir = Path().absolute().parent.absolute().parent/"data"
@@ -917,6 +1020,9 @@ iplot(fig, filename = "Sentiment polarity boxplot by category")
 ```
 
 ```{python}
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 trace1 = go.Scatter(
     x=df_sent['polarity'], y=df_sent['category'], mode='markers', name='points',
     marker=dict(color='rgb(102,0,0)', size=2, opacity=0.4)
@@ -982,27 +1088,25 @@ On the other hand, we see a low density of positive opinions for cars, and almos
 
 Finally, to better represent the observed sentiments we will observe the most frequent pair of words by category in the bigrams below. One of the biggest trends among these bigrams are the pair of words for referring to popular spaces in D.C. such as Florida Avenue, Adams Morgan, Columbia Heights. The frequencies at which these pairs appear by category are interesting: bike bigrams focus on specific avenues and intersections, such as blocks and avenues; the car category has frequent mentions of suburbs such as Maryland and Virginia; and the walk category has frequent mentions of parks, museums and monuments related to positive adjectives such as beautiful. The findings in this analysis highlight the relationship between driving towards suburbs in D.C. and walking/biking towards more touristic places. On the other hand, negative bigrams, such as "pedestrian death" and "rush hour traffic camera," should be considered as repetitive words in the comments, along with other serious opinions like "traffic safety." The walkability category also contains negative bigrams like "sucks" and "unsafe," as well as combinations like "better infrastructure," "poor person," and "homeless people," which require attention.
  
-!["a"](..\img\bigrams_network.png)
+ ```{=html}
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<div id="cars">bi-grams relation of reddit threads about cars in D.C.<br></div>
+<!-- Cars script -->
+<script src="cars.js"></script>
+
+```
  
 In conclusion, we can see that people's attitudes toward different types of transportation in DC vary based on the insights obtained from sentiment analysis and visualizations. Although people tend to comment on bicycles more favorably than on walking or driving, all categories also draw criticism. The analysis of the pairs of words additionally sheds light on how different types of transportation relate to multiple parts of the city. For instance, while bigrams related to cars refer to suburbs like Maryland and Virginia, bigrams related to bikes concentrate on specific streets and blocks. While biking and walking are associated with more popular destinations like parks, museums, and monuments. Urban planners and policymakers may find this information helpful in understanding how various modes of transportation are used and in making decisions about urban planning and transportation infrastructure. It's interesting to note that the positive comments for the walk category are concentrated around a few popular neighborhoods and landmarks in Washington, DC, indicating that the perception of the city's walkability may be influenced by the presence of popular destinations. Furthermore, the negative bigrams associated with automobiles, such as pedestrian fatalities and traffic safety, indicate that there are significant issues that require attention in order to increase safety and accessibility. To conclude this section, we wanted to highlight a particularly eloquent Reddit comment on the walkability gap in Washington, D.C.:
 
 *"I often times see "making DC a better place to live", but the question I ask often is "for who?". For those making enough to live in the inner-most part of the city? How do lower/working class individuals work, live, and enjoy this same city when the commute to do so.. is becoming unmanageable?"*
 
-## Conclusion
 
-Overall, we explored the ease of access in various neighborhoods by foot and by bike, the correlation of walkability to socioeconomic and health outcomes, and sentiment around walkability in Washington, D.C. First, we see that walkability is associated with mixed socioeconomic outcomes, based on geographic area: while all outer parts of Washington, D.C. have low walkability, the top edges have higher car ownership and socioeconomic outcomes, whereas the low edges have low car ownership and poorer socioeconomic outcomes. Second, we see that low walkability is generally associated with poorer health outcomes, which makes sense because having decreased access to walking would limit mobility and health outcomes. After examining walkability and its assocation with various outcomes, we examined bikability and noticed that there are more neighborhood-downtown bike lanes and fewer neighborhood-neighborhood bike lanes. Given that housing and spending are generally higher in downtown areas, this trend makes it more expensive and unsafe to travel between lower-income areas. Finally, we investigated public sentiment on walking, biking, and cars in Washington, D.C. and discovered that people tend to comment on bicycles more favorably than on walking or driving, all categories also draw criticism.
-
-It is important to note that various socioeconomic and health outcomes as well as walkability are interconnected and contribute to a complex web of influences on each other. Overall, our findings show that higher walkability in neighborhoods can promote physical activity, access to healthy food, and overall environmental and socioeconomic well-being, which in turn can positively impact various health metrics. If we had more time to conduct this study, we would love to explore the interactions between socioeconomic and health metrics to help us contextualize the relationship between walkability and such outcomes, so to have a better understanding of the causal and correlational relationships between these factors. For our text data, we would also further contextualize the sentiment analysis and differentiate between sentences like "I hate that walkability in Washington, D.C. is bad" and "I hate walking in Washington, D.C." to obtain more accurate findings. 
-
-As Washington, D.C. is among the most walkable cities in the US, we hope that this study can increase awareness of the importance of walkability and even inspire future initiatives in improving walkability in Washington, D.C. and other cities too. Having an equitable access to amenities like grocery stores and community health centers is vital to positive outcomes, and we hope that this study might inspire you to find ways to learn more about and promote walkability in where you live.   
-
-
-## Works Cited
-
-[^1] [Glaeser & Kahn 2004](https://www.sciencedirect.com/science/article/abs/pii/S1574008004800130)
-[^2] [US News U.S. Cities Trail Behind Global Peers in Walkability Report Finds](https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds)
-[^3]: [Heliyon 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182722/#:~:text=Oral%20health%20problems%20might%20lead,17%2C%2018%2C%2027%5D.)
-[^4]: [Capital Bike Share History](https://ride.capitalbikeshare.com/about)
-[^5]: [D.C. Department of Transportation Capital Bikeshare](https://ddot.dc.gov/page/capital-bikeshare)
-[^6]: [D.C. Department of Transportation Bicycle Program](https://ddot.dc.gov/page/bicycle-program)
-[^7]: [D.C. Department of Transportation Bike Lanes](https://ddot.dc.gov/page/bicycle-lanes)
+[^1]: Glaeser & Kahn 2004 , https://www.sciencedirect.com/science/article/abs/pii/S1574008004800130
+[^2]: US News U.S. Cities Trail Behind Global Peers in Walkability Report Finds(https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds)
+[^3]: Heliyon 2020, (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182722/#:~:text=Oral%20health%20problems%20might%20lead,17%2C%2018%2C%2027%5D.)
+[^4]: Capital Bike Share History,(https://ride.capitalbikeshare.com/about)
+[^5]: D.C. Department of Transportation Capital Bikeshare, (https://ddot.dc.gov/page/capital-bikeshare)
+[^6]: D.C. Department of Transportation Bicycle Program, (https://ddot.dc.gov/page/bicycle-program)
+[^7]: D.C. Department of Transportation Bike Lanes, (https://ddot.dc.gov/page/bicycle-lanes)
