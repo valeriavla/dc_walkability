@@ -190,6 +190,7 @@ points = alt.Chart(tmp2).mark_circle().encode(
 
 
 # Show visualization
+(background + background_lanes + connections + points).configure_view(stroke=None).save('bike_graph.html')
 (background + background_lanes + connections + points).configure_view(stroke=None)
 
 ```
