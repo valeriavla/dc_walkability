@@ -53,6 +53,54 @@ def depression_data():
     # return cleaned dataframe
     return(depression_data)
 
+def depression_no_filter_data():
+    """
+    Subsets the depression data file to only the depression data for DC and PG County, MD
+    INPUT: None, but expects data file to already exist: `raw_data/depression_census_tract_data.csv`
+    OUTPUT: Dataframe with depression rate for DC and P.G. County census tracts
+
+    Data source: https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Local-Data-for-Better-Health-Place-Data-202/eav7-hnsx
+    """
+    print("\n~*~*~*~*~*~*~*~* Cleaning depression data ~*~*~*~*~*~*~*~*")
+    # file_name = 'PLACES__Local_Data_for_Better_Health__Census_Tract_Data_2022_release.csv'
+    file_name = 'depression_census_tract_data.csv'
+    file_path_name = os.path.join(data_folder, file_name)
+
+    try:
+        all_tracts_df = pd.read_csv(file_path_name)
+    except:
+        while not os.path.exists(file_path_name):
+            input("Visit https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Local-Data-for-Better-Health-Place-Data-202/eav7-hnsx\n"+
+                "and save the file at the census tract level with file name `depression_census_tract_data.csv`\n"+
+                "in the `raw_data` folder located above this folder.\n"+
+                "Press `enter` when finished.")
+            all_tracts_df = pd.read_csv(file_path_name)
+
+    # ----- SET ALL THE FILTERS THAT WE'LL APPLY TO THE DATA -----
+    # md_filter = (all_tracts_df['StateAbbr']=='MD') & (all_tracts_df['CountyName']=="Prince George's")
+    # dc_filter = (all_tracts_df['StateAbbr']=='DC')
+    # location_filter = (md_filter | dc_filter)
+    measure_filter = (all_tracts_df.Measure.str.contains('Depress'))
+    # set the subset year (we eventually want to make this more dynamic in future iterations)
+    subset_year = 2020
+    year_filter = (all_tracts_df.Year == subset_year)
+
+    # subset this to depression data for DC and PG county Maryland
+    depression_data = all_tracts_df[year_filter & measure_filter].copy(deep=True)
+
+    # convert LocationID so that it's a string
+    depression_data['LocationID'] = depression_data['LocationID'].astype(str)
+
+    # rename column with value to be the format that the need score file expects
+    # depression_data = depression_data.rename({'Data_Value': 'perc_depression'}, axis='columns')
+
+    # sanity check; print lines for status report
+    print("Number of census tracts with depression data:", len(depression_data))
+    print("Counties pulled for depression data:", depression_data.CountyName.unique())
+    
+    # return cleaned dataframe
+    return(depression_data)
+
 def walkability_data():
     """
     Aggregates a Walkability score for each census tract by getting the median score across census blocks.
@@ -178,7 +226,7 @@ def join_and_clean():
     Call other functions to generate dataframes, join them, clean column names, and write file
     """
     # grab all data 
-    depress_df = depression_data()
+    depress_df = depression_no_filter_data()
     walkability_df = walkability_data()
     cre_data = cre_equity_data()
 
@@ -213,7 +261,7 @@ def join_and_clean():
     # write file and provide instructions
     clean_joined_file.to_csv(os.path.join(output_folder, 'joined_depression_cre_walkability.csv'), index=False)
     print("\n\nNumber of census tracts in final file: ", len(clean_joined_file))
-    input("Final file is now located in `cleaned_data/joined_depression_cre_walkability.csv`.\n"+
+    input("Final file is now located in `cleaned_data/nation-joined_depression_cre_walkability.csv`.\n"+
         "Add this file to this Google Drive folder:\n"+
         "https://drive.google.com/drive/u/1/folders/1a47wAE9k2hAA5MzRlZTMjNIeSdHFwq5l\n"+
         "then press enter.")
