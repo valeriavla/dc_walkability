@@ -17,9 +17,7 @@ To explore this topic further, we aim to answer the following data science quest
 
 We answer these questions by first collecting, cleaning, and exploring US Census Tract, Capital Bike Share, PLACES Census Health Data Estimation, and Reddit data. Based on our initial data exploration, we investigate the ease of access of different neighborhoods, or census tracts, by foot, which is our primary measure of walkability. We also explore the correlation between walkability in different tracts and social and health outcomes. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic. 
 
-
-
-
+To learn more about the methodology, please visit our methods page. 
 
 
 ## 1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
