@@ -2,9 +2,11 @@
 title: "Walkability in D.C."
 ---
 
-## Problem
+## Background
 
-describe problem 
+Walkability is defined as the ease with which people can access amenities in a place without the use of cars. Walkability is associated with equitable access to key resources as well as positive outcomes in health, social bonding and community-building, sustainability, and livability. While urban areas in the US initially developed around transportation by foot, the mass introduction of cars and motorized vehicles in the 1950s led to urban sprawl, which is an expansion pattern consisting of low-density areas and car-dependent lifestyles (Galeser & Kahn, 2004). A report by the Institute for Transportation and Development Policy evaluated the walkability of nearly 1,000 cities globally. The report placed London, Hong Kong, and Paris as some of the cities with highest walkability scores and U.S. cities particularly low on the list as a result of urban sprawl (Hubbarb 2020). 
+
+The same report found that the only city in the US to make the top 25 in any category was Washington, D.C. Our personal experience living in Washington, D.C. also mirrors the fact that Washington, D.C. seems like a walkable city compared to many other cities in the US. However, some members in our group have also lived in cities with high walkability around the world and saw first-hand the impact of a city's walkability on well-being. As our graduate program has brought us together from around the world to Washington, D.C., it would not just be professionally intriguing, but also personally meaningful to learn more about the city's walkability. 
 
 ## Objective
 
@@ -18,4 +20,6 @@ Data Science questions
 
 Valeria to add citations feel free to list the resources you are using here
 
-1.
+1.https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds
+2. Glaeser, E. L., and Kahn, M. E. (2004). “Sprawl and Urban Growth,” in Handbook of Regional and Urban Economics (Elsevier), 2481–2527. doi:10.1016/s1574-0080(04)80013-0
+
