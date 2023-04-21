@@ -12,48 +12,412 @@ format:
         code-fold: true
 ---
 
-# Read in Datasets
 
-- DC GeoJSON File
-- 
+Relevant libraries were imported:
 
 ```{python}
-import pandas as pd
+# IMPORT RELEVANT LIBRARIES
 import numpy as np
-import altair as alt
+import pandas as pd
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
 import plotly.graph_objects as go
-#from vega_datasets import data
-import requests
+import plotly.offline as pyo
+import numpy as np
 import json
-```
-
-# Washington DC map with no data encoded
-
-
-```{python}
-# Function to download geojson file
-response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
-# Create background of D.C.
-background = alt.Chart(alt.Data(values=response1.json())).mark_geoshape(
-        fill="lightgray",
-        stroke='white',
-        strokeWidth=1
-    ).encode(
-    ).properties(
-        width=600,
-        height=600
-    )
-background
+import requests
+import numpy as np
+import scipy.stats
+import plotly.subplots as sp
+from pathlib import Path
 ```
 
 
-# Health Data
+
+
+# Association Between Health Factors
+
 - Source: PLACES Census Health Data Estimation
+- Dataset contains model-based census tract level estimates for PLACES 2022 release.
+PLACES covers the entire United States at county, place, census tract, and ZIP Code Tabulation Area levels.
+- Estimates provided by CDC's Division of Population Health, Epidemiology and Surveillance Branch
+- Data sources used are Behavioral Risk Factor Surveillance System (BRFSS) 2020/2019, Census Bureau 2010 population estimates, and American Community Survey (ACS) 2015-2019 estimates.
+- 29 measures can be mapped at the census tract level using GIS systems
+
+
 ```{python}
 # import the csv
 dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
 
-# filter for DC
-dc_health_df.head()
+# filter for where StateAbbr = DC
+dc_health_df = dc_health_df[dc_health_df['StateAbbr'] == 'DC']
 
+# Resetting defaults and import plotly libraries
+import plotly.io as pio
+pio.renderers.default = "browser"
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"
+import statsmodels.api as sm
+import numpy as np
+from sklearn.metrics import r2_score
+
+
+# isolate only columns with CrudePrev in the name
+dc_health_df_prev = dc_health_df.filter(regex='CrudePrev')
+df = dc_health_df_prev
+
+# Rename columns
+df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insurance', 
+                        'ARTHRITIS_CrudePrev': '% of Adults with Arthritis', 
+                        'BINGE_CrudePrev': '% of Adults who Binge Drink',
+                        'BPHIGH_CrudePrev': '% of Adults with High Blood Pressure',
+                        'BPMED_CrudePrev': '% of Adults with High Blood Pressure who take Blood Pressure Medication',
+                        'CANCER_CrudePrev': '% of Adults who were Diagnosed with Cancer',
+                        'CASTHMA_CrudePrev': '% of Adults who were Diagnosed with Asthma',
+                        'CERVICAL_CrudePrev': '% of Women who had a Pap Smear in the Past 3 Years',
+                        'CHD_CrudePrev': '% of Adults who were Diagnosed with Coronary Heart Disease',
+                        'CHECKUP_CrudePrev': '% of Adults who had a Routine Checkup in the Past Year',
+                        'CHOLSCREEN_CrudePrev': '% of Adults who had Cholesterol Checked in the Past 5 Years',
+                        'COLON_SCREEN_CrudePrev': '% of Adults who had a Colonoscopy or similar test in the Past 10 Years',
+                        'COPD_CrudePrev': '% of Adults who were Diagnosed with COPD (Chronic Obstructive Pulmonary Disease)',
+                        'COREM_CrudePrev': '% Prevalence of Older Adult Men aged >=65 years who are up to date on preventative health',
+                        'COREW_CrudePrev': '% Prevalence of Older Adult Women aged >=65 years who are up to date on preventative health',
+                        'CSMOKING_CrudePrev': '% of Adults who Currently Smoke',
+                        'DENTAL_CrudePrev': '% of Adults who had a Dental Visit in the Past Year',
+                        'DEPRESSION_CrudePrev': '% of Adults who were Diagnosed with Depression',
+                        'DIABETES_CrudePrev': '% of Adults who were Diagnosed with Diabetes',
+                        'GHLTH_CrudePrev': '% of Adults who reported their Health as not Good',
+                        'HIGHCHOL_CrudePrev': '% of Adults who were Diagnosed with High Cholesterol',
+                        'KIDNEY_CrudePrev': '% of Adults who were Diagnosed with Kidney Disease',
+                        'LPA_CrudePrev': '% of Adults who are Physically Inactive', 
+                        'MAMMOUSE_CrudePrev': '% Women aged 50-74 years who had a Mammogram in the Past 2 Years',
+                        'MHLTH_CrudePrev': '% of Adults who reported their Mental Health as not Good',
+                        'OBESITY_CrudePrev': '% of Adults who were Obese',
+                        'PHLTH_CrudePrev': '% of Adults who reported their Physical Health as not Good',
+                        'SLEEP_CrudePrev': '% of Adults who reported their Sleep as not Good',
+                        'STROKE_CrudePrev': '% of Adults who were Diagnosed with Stroke',
+                        'TEETHLOST_CrudePrev': '% of Adults who have lost all of their Natural Teeth'})
+
+# list of health metrics for drop down menu
+column_names = df.columns
+
+# Creating the initial scatter plot
+fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
+
+for col in column_names:
+    for col2 in column_names:
+        x = df[col]
+        y = df[col2]
+        fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name=col + ' vs ' + col2, showlegend=False, visible=False))
+
+
+# Update the visibility of the traces
+        
+
+def update_visibility(selected_col, selected_col2):
+    for i, trace in enumerate(fig.data):
+        if trace.name == selected_col + ' vs ' + selected_col2:
+            trace.visible = True
+        elif trace.name == selected_col + ' vs ' + selected_col2 + ' Best Fit':
+            trace.visible = True
+        else:
+            trace.visible = False
+
+# Create the drop-down menus for x (col) and y (col2) axes of the scatter plot
+col_dropdown = [{'label': col, 'value': col} for col in column_names]
+col2_dropdown = [{'label': col2, 'value': col2} for col2 in column_names]
+
+# #Define the dropdown menu for x-axis
+button_layer_1_height = 1.08
+x_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([dict(args=[{'x': [df[col]]}, update_visibility(col, col2)], label=col, method='update') for col in column_names]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height + 0.05,
+    yanchor="top"
+)
+
+
+
+# Define the dropdown menu for y-axis
+y_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([dict(args=[{'y': [df[col2]]}, update_visibility(col, col2)], label=col2, method='update') for col2 in column_names]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height,
+    yanchor="top"
+)
+
+
+
+
+# Update the layout to include the dropdown menus
+fig.update_layout(
+    updatemenus=[x_axis_dropdown, y_axis_dropdown]
+)
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
+
+# Update plot sizing
+fig.update_layout(
+    width=900,
+    height=900,
+    autosize=False,
+    #margin=dict(t=100, b=0, l=0, r=0),
+)
+
+# add annotations
+fig.update_layout(
+    annotations=[
+        dict(
+            text="X Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height + 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        ),
+        dict(
+            text="Y Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height - 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        )
+    ]
+)
+
+
+# Change background color to grey
+fig.update_layout(
+    plot_bgcolor='rgb(230, 230, 230)'
+)
+
+# Change scatter point color to red
+fig.update_traces(
+    marker=dict(color='red')
+)
+
+# Change font to Calibri
+fig.update_layout(
+    font=dict(family='Proxima Nova')
+)
+
+# # # Create a function to update the visibility of the traces based on selected columns
+# def update_visibility(selected_col, selected_col2):
+#     for i, trace in enumerate(fig.data):
+#         trace.visible = (trace.name == selected_col + ' vs ' + selected_col2)
+#         trace.visible = (trace.name == selected_col + ' vs ' + selected_col2 + ' Best Fit')
+
+
+
+
+# Display the scatter plot with dropdown menus
+fig.show()
+
+```
+
+
+# Walkability as a Predictor of Health
+
+- PLACES data was joined with Census-tract level walkability scores for DC neighborhoods
+
+```{python}
+# Import walkability data
+
+df_walk = pd.read_csv('./joined_depression_cre_walkability.csv')
+dc_health_df.rename(columns={'TractFIPS': 'census_tract'}, inplace=True)
+df_walk.rename(columns={'geoid_tract_20': 'census_tract'}, inplace=True)
+# Merge the two dataframes
+df_merged = pd.merge(dc_health_df, df_walk, on='census_tract', how='left')
+
+# Resetting defaults and import plotly libraries
+import plotly.io as pio
+pio.renderers.default = "browser"
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"
+
+# isolate only columns with CrudePrev in the name
+dc_health_df_prev = df_merged.filter(regex='CrudePrev')
+# add the walkability_score column back in
+dc_health_df_prev['walkability_score'] = df_merged['walkability_score']
+df = dc_health_df_prev
+
+# Rename columns
+df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insurance', 
+                        'ARTHRITIS_CrudePrev': '% of Adults with Arthritis', 
+                        'BINGE_CrudePrev': '% of Adults who Binge Drink',
+                        'BPHIGH_CrudePrev': '% of Adults with High Blood Pressure',
+                        'BPMED_CrudePrev': '% of Adults with High Blood Pressure who take Blood Pressure Medication',
+                        'CANCER_CrudePrev': '% of Adults who were Diagnosed with Cancer',
+                        'CASTHMA_CrudePrev': '% of Adults who were Diagnosed with Asthma',
+                        'CERVICAL_CrudePrev': '% of Women who had a Pap Smear in the Past 3 Years',
+                        'CHD_CrudePrev': '% of Adults who were Diagnosed with Coronary Heart Disease',
+                        'CHECKUP_CrudePrev': '% of Adults who had a Routine Checkup in the Past Year',
+                        'CHOLSCREEN_CrudePrev': '% of Adults who had Cholesterol Checked in the Past 5 Years',
+                        'COLON_SCREEN_CrudePrev': '% of Adults who had a Colonoscopy or similar test in the Past 10 Years',
+                        'COPD_CrudePrev': '% of Adults who were Diagnosed with COPD (Chronic Obstructive Pulmonary Disease)',
+                        'COREM_CrudePrev': '% Prevalence of Older Adult Men aged >=65 years who are up to date on preventative health',
+                        'COREW_CrudePrev': '% Prevalence of Older Adult Women aged >=65 years who are up to date on preventative health',
+                        'CSMOKING_CrudePrev': '% of Adults who Currently Smoke',
+                        'DENTAL_CrudePrev': '% of Adults who had a Dental Visit in the Past Year',
+                        'DEPRESSION_CrudePrev': '% of Adults who were Diagnosed with Depression',
+                        'DIABETES_CrudePrev': '% of Adults who were Diagnosed with Diabetes',
+                        'GHLTH_CrudePrev': '% of Adults who reported their Health as not Good',
+                        'HIGHCHOL_CrudePrev': '% of Adults who were Diagnosed with High Cholesterol',
+                        'KIDNEY_CrudePrev': '% of Adults who were Diagnosed with Kidney Disease',
+                        'LPA_CrudePrev': '% of Adults who are Physically Inactive', 
+                        'MAMMOUSE_CrudePrev': '% Women aged 50-74 years who had a Mammogram in the Past 2 Years',
+                        'MHLTH_CrudePrev': '% of Adults who reported their Mental Health as not Good',
+                        'OBESITY_CrudePrev': '% of Adults who were Obese',
+                        'PHLTH_CrudePrev': '% of Adults who reported their Physical Health as not Good',
+                        'SLEEP_CrudePrev': '% of Adults who reported their Sleep as not Good',
+                        'STROKE_CrudePrev': '% of Adults who were Diagnosed with Stroke',
+                        'TEETHLOST_CrudePrev': '% of Adults who have lost all of their Natural Teeth'})
+
+# list of health metrics for drop down menu
+column_names = df.columns
+
+# Creating the initial scatter plot
+fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
+
+# Label axes
+fig.update_xaxes(title_text='Walkability Score')
+fig.update_yaxes(title_text='Y Axis')
+
+# Setting the range for x and y axes
+#fig.update_xaxes(range=[0, 100])
+fig.update_xaxes(range=[0, max(df['walkability_score'])])
+fig.update_yaxes(range=[0, 100])
+
+for col in column_names:
+    fig.add_trace(go.Scatter(x=df['walkability_score'], y=df[col], mode='markers', name='Walkability vs ' + col, visible=False))
+
+
+def update_visibility(selected_col, selected_col2):
+    return [(trace.name == selected_col + ' vs ' + selected_col2) for trace in fig.data]
+
+
+# Create the drop-down menus for x (col) and y (col2) axes of the scatter plot
+col_dropdown = [{'label': col, 'value': col} for col in column_names]
+
+# Define the dropdown menu for x-axis
+button_layer_1_height = 1.08
+
+y_axis_dropdown = go.layout.Updatemenu(
+    buttons=list([
+        dict(
+            args=[
+                {"y": [df[col]], "visible": [(trace.name == "Walkability vs " + col) for trace in fig.data]}
+            ],
+            label=col,
+            method="update",
+        ) for col in column_names
+    ]),
+    direction="down",
+    pad={"r": 10, "t": 10},
+    showactive=True,
+    x=0.06,
+    xanchor="left",
+    y=button_layer_1_height,
+    yanchor="top"
+)
+
+
+
+
+# Update the layout to include the dropdown menus
+fig.update_layout(
+    updatemenus=[y_axis_dropdown]
+)
+
+# Label axes
+fig.update_xaxes(title_text='X Axis')
+fig.update_yaxes(title_text='Y Axis')
+
+
+
+# Update plot sizing
+fig.update_layout(
+    width=900,
+    height=900,
+    autosize=False,
+    #margin=dict(t=100, b=0, l=0, r=0),
+)
+
+# add annotations
+fig.update_layout(
+    annotations=[
+        dict(
+            text="X Axis: Walkability Score of the Neighborhood",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height + 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        ),
+        dict(
+            text="Y Axis:",
+            x=0,
+            xref="paper",
+            y=button_layer_1_height - 0.025,
+            yref="paper",
+            align="left",
+            showarrow=False
+        )
+    ]
+)
+
+
+def update_visibility(selected_col, selected_col2):
+    return [(trace.name == selected_col + ' vs ' + selected_col2) for trace in fig.data]
+
+
+# Change background color to grey
+fig.update_layout(
+    plot_bgcolor='rgb(230, 230, 230)'
+)
+
+# Change scatter point color to red
+fig.update_traces(
+    marker=dict(color='red')
+)
+
+# Change font to Calibri
+fig.update_layout(
+    font=dict(family='Proxima Nova')
+)
+
+
+# Display the scatter plot with dropdown menus
+fig.show()
 ```
