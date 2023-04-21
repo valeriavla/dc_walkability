@@ -9,7 +9,6 @@ website:
         text: Home
       - authors.qmd
       - sidebar:data
-      - findings.qmd
       - conclusion.qmd
   sidebar:
     - id: data
@@ -17,7 +16,8 @@ website:
       contents:
       - data_collection.qmd
       - data_cleaning.qmd
-      - data_exploration.qmd
+      - methods.qmd
+
 
 format:
   html:

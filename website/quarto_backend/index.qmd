@@ -38,8 +38,8 @@ IMPORT DATA
 """
 
 # define data directory
-data_dir = Path().absolute().parent/"data"
-img_dir = Path().absolute().parent/"data"/"img"
+data_dir = Path().absolute().parent.absolute().parent/"data"
+img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
 
 # import data
 walkability = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
@@ -262,7 +262,10 @@ import plotly.subplots as sp
 from pathlib import Path
 
 # import the csv
-dc_health_df = pd.read_csv('../../PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
+data_dir = Path().absolute().parent.absolute().parent/"data"
+img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+
+dc_health_df = pd.read_csv(data_dir/"PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv")
 
 # filter for where StateAbbr = DC
 dc_health_df = dc_health_df[dc_health_df['StateAbbr'] == 'DC']
@@ -457,7 +460,7 @@ fig.show()
 
 # Import walkability data
 
-df_walk = pd.read_csv('./joined_depression_cre_walkability.csv')
+df_walk = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
 dc_health_df.rename(columns={'TractFIPS': 'census_tract'}, inplace=True)
 df_walk.rename(columns={'geoid_tract_20': 'census_tract'}, inplace=True)
 # Merge the two dataframes
@@ -647,7 +650,11 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Read in data
-bikeshare_df = pd.read_csv('../../data/202303-capitalbikeshare-tripdata.csv')
+
+data_dir = Path().absolute().parent.absolute().parent/"data"
+img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+
+bikeshare_df = pd.read_csv(data_dir/"02303-capitalbikeshare-tripdata.csv")
 
 # Convert dates into datetime format
 bikeshare_df['started_at'] = pd.to_datetime(bikeshare_df['started_at'])
@@ -837,9 +844,12 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import json
 
 #opening previously modified sentiment analysis
-b_sent = pd.read_csv("../../data/bikes_sent.csv")
-c_sent = pd.read_csv("../../data/cars_sent.csv")
-w_sent = pd.read_csv("../../data/walk_sent.csv")
+data_dir = Path().absolute().parent.absolute().parent/"data"
+img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+
+b_sent = pd.read_csv(data_dir/"bikes_sent.csv")
+c_sent = pd.read_csv(data_dir/"cars_sent.csv")
+w_sent = pd.read_csv(data_dir/"walk_sent.csv")
 
 # drop index
 b_sent = b_sent.drop(columns=['Unnamed: 0'])
