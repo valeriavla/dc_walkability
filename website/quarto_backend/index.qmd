@@ -17,8 +17,9 @@ To explore this topic further, we aim to answer the following data science quest
 
 We answer these questions by first collecting, cleaning, and exploring US Census Tract, Capital Bike Share, PLACES Census Health Data Estimation, and Reddit data. Based on our initial data exploration, we investigate the ease of access of different neighborhoods, or census tracts, by foot, which is our primary measure of walkability. We also explore the correlation between walkability in different tracts and social and health outcomes. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic. 
 
-[^1] [Glaeser & Kahn 2004](https://www.sciencedirect.com/science/article/abs/pii/S1574008004800130)
-[^2] [US News U.S. Cities Trail Behind Global Peers in Walkability Report Finds](https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds)
+
+
+
 
 
 ## 1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
@@ -263,7 +264,7 @@ import plotly.subplots as sp
 from pathlib import Path
 
 # import the csv
-dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
+dc_health_df = pd.read_csv('../../PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
 
 # filter for where StateAbbr = DC
 dc_health_df = dc_health_df[dc_health_df['StateAbbr'] == 'DC']
@@ -631,9 +632,8 @@ fig.show()
 
 After examining the relationship between walkability and socioeconomic outcomes, we wanted to investigate the relationship between walkability and health outcomes as well. In the graph above, we can see that on the x-axis we have walkability score and on the y-axis we have the selected health metric. The data is presented at the neighborhood level; in other words, each data point on the scatter plot represents a neighborhood in Washington, D.C. as defined by U.S. Census Tract data. 
 
-Upon exploring the different health metrics, we can see that neighborhoods with low walkability fare worse at many health metrics, such as percentage of adults who lost all their adult teeth and percentage of adults who are physically inactive. This makes sense because lower walkability makes it harder to be physically active. In addition, oral health is correlated to diverse health outcomes including oral health. However, there are interactions between health outcomes, such as the impact of poor oral health on physical activity, that might not point to a straightforward causal relationship between walkability and a particular health outcome.[^1] We can reference the first graph that shows the relationship between pairs of health metrics to understand interactions between health metrics more. 
+Upon exploring the different health metrics, we can see that neighborhoods with low walkability fare worse at many health metrics, such as percentage of adults who lost all their adult teeth and percentage of adults who are physically inactive. This makes sense because lower walkability makes it harder to be physically active. In addition, oral health is correlated to diverse health outcomes including oral health. However, there are interactions between health outcomes, such as the impact of poor oral health on physical activity, that might not point to a straightforward causal relationship between walkability and a particular health outcome.[^3] We can reference the first graph that shows the relationship between pairs of health metrics to understand interactions between health metrics more. 
 
-[^1]: [Heliyon 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182722/#:~:text=Oral%20health%20problems%20might%20lead,17%2C%2018%2C%2027%5D.)
 
 
 ## 3. How accessible are neighborhoods in Washington, D.C. by bike?
@@ -796,7 +796,7 @@ points = alt.Chart(tmp2).mark_circle().encode(
 
 Following our exploration of the relationship between a neighborhood's walkability score and its socioeconomic and health outcomes, we wanted to explore another dimension of walkability - ease of access of bikes. To do this, we explored the distribution of Capital Bikeshare stations and bike lanes across Washington, D.C.. 
 
-Capital Bikeshare is a bikeshare system that services the D.C. metro area in collaboration with the D.C. government and surrounding jurisdictions (e.g., Arlington VA, Alexandria VA, Montgomery County MD, etc.). It launched in 2010 and has since expanded to have over 600 stations and 5,000 bikes. Bikes from the network are docked at the various stations and can be used by anyone in the city at any time for a low cost[^1]. Capital Bikeshare is one of the largest bikesharing systems in the country and contributes to the D.C. Government Department of Transportation's commitment to improve bicycle access throughout the city, reduce car dependency, and encourage bicycle use for work, tourism, and more[^2]. Bike lanes throughout the city are equally important because they allow bicyclists to safely travel on bike throughout the city. Each year, on average, there are approximately 265 bicycle crashes reported in the D.C.[^3]. To increase public safety on bikes, the city has created over 100 miles of bike lanes since 2001 and has committed to building 20 additional miles by 2023[^4]. Since bike lanes and the Capital Bikeshare program are two major initiatives for improving quality of life and transportation access in D.C., our team decided to analyze data from both programs together. We created the following questions to help guide our development of a visual plot:
+Capital Bikeshare is a bikeshare system that services the D.C. metro area in collaboration with the D.C. government and surrounding jurisdictions (e.g., Arlington VA, Alexandria VA, Montgomery County MD, etc.). It launched in 2010 and has since expanded to have over 600 stations and 5,000 bikes. Bikes from the network are docked at the various stations and can be used by anyone in the city at any time for a low cost[^4]. Capital Bikeshare is one of the largest bikesharing systems in the country and contributes to the D.C. Government Department of Transportation's commitment to improve bicycle access throughout the city, reduce car dependency, and encourage bicycle use for work, tourism, and more[^5]. Bike lanes throughout the city are equally important because they allow bicyclists to safely travel on bike throughout the city. Each year, on average, there are approximately 265 bicycle crashes reported in the D.C.[^6]. To increase public safety on bikes, the city has created over 100 miles of bike lanes since 2001 and has committed to building 20 additional miles by 2023[^7]. Since bike lanes and the Capital Bikeshare program are two major initiatives for improving quality of life and transportation access in D.C., our team decided to analyze data from both programs together. We created the following questions to help guide our development of a visual plot:
 
 - Where are the Capital Bikeshare stations and bike lanes located? Are they concentrated in any area in particular?
 - What Capital Bikeshare stations are the most popular? Which ones are the least popular?
@@ -809,17 +809,13 @@ The trends highlighted by our visual plot indicate that the D.C. Department of T
 
 Our visualization highlights that while D.C. has come a long way in providing bikeshare and bike lane access, improvements can be made by creating bike stations and bike lanes across adjacent neighborhoods. With these improvements, individuals from all backgrounds looking to enjoy what D.C. has to offer outside of just downtown will one day be able to this with a bike!
 
-[^1]: [Capital Bike Share History](https://ride.capitalbikeshare.com/about)
-[^2]: [D.C. Department of Transportation Capital Bikeshare](https://ddot.dc.gov/page/capital-bikeshare)
-[^3]: [D.C. Department of Transportation Bicycle Program](https://ddot.dc.gov/page/bicycle-program)
-[^4]: [D.C. Department of Transportation Bike Lanes](https://ddot.dc.gov/page/bicycle-lanes)
 
 
 ## 4. What is public sentiment around walkability in Washington, D.C.? 
 
-Following the above analysis, we wanted to gauge public sentiment around walkability in Washington, D.C. to see if that sheds light on our quantitative findings. We first want to observe the most frequent words accross categories. Sentiment analysis of user comments is a crucial tool for comprehending socially relevant issues like transportation and walkability of cities, which can help guide decisions that improve the quality of life for locals, workers, and visitors alike. By analyzing the sentiment of user opinions, we can gain a deeper understanding of how people feel about these factors and how they impact their ability and willingness to transit in a particular city. For instance, sentiment analysis can show whether people feel safe walking through particular neighborhoods or whether they find it simple to get to bike lanes or public transportation. Additionally, sentiment analysis can be used to find neighborhoods that are more walkable for particular groups of people or where certain amenities are lacking, as well as places where there are disparities in walkability. Cities can work to build more equitable and inclusive communities by addressing these disparities. In this work we gathered reddit user's opinions for different transportation and walkability topics in D.C. the topics are related to vehicles, bicycle and walkability.
+Following the above analysis, we wanted to gauge public sentiment around walkability in Washington, D.C. to see if that sheds light on our quantitative findings. We first want to observe the most frequent words across categories. Sentiment analysis of user comments is a crucial tool for comprehending socially relevant issues like transportation and walkability of cities, which can help guide decisions that improve the quality of life for locals, workers, and visitors alike. By analyzing the sentiment of user opinions, we can gain a deeper understanding of how people feel about these factors and how they impact their ability and willingness to transit in a particular city. For instance, sentiment analysis can show whether people feel safe walking through particular neighborhoods or whether they find it simple to get to bike lanes or public transportation. Additionally, sentiment analysis can be used to find neighborhoods that are more walkable for particular groups of people or where certain amenities are lacking, as well as places where there are disparities in walkability. Cities can work to build more equitable and inclusive communities by addressing these disparities. In this work we gathered reddit user's opinions for different transportation and walkability topics in D.C. the topics are related to vehicles, bicycle and walkability.
 
-We first want to observe the most frequent words accross categories. 
+We first want to observe the most frequent words across categories. 
 
 !["wordcloud"](..\img\wordcloud.png)
 
@@ -843,9 +839,9 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import json
 
 #opening previously modified sentiment analysis
-b_sent = pd.read_csv("../data/bikes_sent.csv")
-c_sent = pd.read_csv("../data/cars_sent.csv")
-w_sent = pd.read_csv("../data/walk_sent.csv")
+b_sent = pd.read_csv("../../data/bikes_sent.csv")
+c_sent = pd.read_csv("../../data/cars_sent.csv")
+w_sent = pd.read_csv("../../data/walk_sent.csv")
 
 # drop index
 b_sent = b_sent.drop(columns=['Unnamed: 0'])
@@ -992,8 +988,13 @@ It is important to note that various socioeconomic and health outcomes as well a
 
 As Washington, D.C. is among the most walkable cities in the US, we hope that this study can increase awareness of the importance of walkability and even inspire future initiatives in improving walkability in Washington, D.C. and other cities too. Having an equitable access to amenities like grocery stores and community health centers is vital to positive outcomes, and we hope that this study might inspire you to find ways to learn more about and promote walkability in where you live.   
 
-## Bibliography
 
-# Valeria to add citations feel free to list the resources you are using here
+## Works Cited
 
-
+[^1] [Glaeser & Kahn 2004](https://www.sciencedirect.com/science/article/abs/pii/S1574008004800130)
+[^2] [US News U.S. Cities Trail Behind Global Peers in Walkability Report Finds](https://www.usnews.com/news/cities/articles/2020-10-16/us-cities-trail-behind-global-peers-in-walkability-report-finds)
+[^3]: [Heliyon 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182722/#:~:text=Oral%20health%20problems%20might%20lead,17%2C%2018%2C%2027%5D.)
+[^4]: [Capital Bike Share History](https://ride.capitalbikeshare.com/about)
+[^5]: [D.C. Department of Transportation Capital Bikeshare](https://ddot.dc.gov/page/capital-bikeshare)
+[^6]: [D.C. Department of Transportation Bicycle Program](https://ddot.dc.gov/page/bicycle-program)
+[^7]: [D.C. Department of Transportation Bike Lanes](https://ddot.dc.gov/page/bicycle-lanes)
