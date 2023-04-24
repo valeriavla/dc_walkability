@@ -306,17 +306,20 @@ df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insuran
 # list of health metrics for drop down menu
 column_names = df.columns
 
+# # Alter walkability score to 0 to 100
+df['walkability_score'] = (df['walkability_score'] - df['walkability_score'].min()) / (df['walkability_score'].max() - df['walkability_score'].min()) * 100
+
+# Setting the range for x and y axes
+#fig.update_xaxes(range=[0, 100])
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
+
 # Creating the initial scatter plot
-fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
+fig = go.Figure(go.Scatter(x=df['walkability_score'], y=df['% of Adults without Health Insurance'], mode='markers'))
 
 # Label axes
 fig.update_xaxes(title_text='Walkability Score')
 fig.update_yaxes(title_text='Y Axis')
-
-# Setting the range for x and y axes
-#fig.update_xaxes(range=[0, 100])
-fig.update_xaxes(range=[0, max(df['walkability_score'])])
-fig.update_yaxes(range=[0, 100])
 
 for col in column_names:
     fig.add_trace(go.Scatter(x=df['walkability_score'], y=df[col], mode='markers', name='Walkability vs ' + col, visible=False))
@@ -417,6 +420,8 @@ fig.update_layout(
     font=dict(family='Proxima Nova')
 )
 
+fig.update_xaxes(range=[0, 100])
+fig.update_yaxes(range=[0, 100])
 
 # Display the scatter plot with dropdown menus
 fig.show()
