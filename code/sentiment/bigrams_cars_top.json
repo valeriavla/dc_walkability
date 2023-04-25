@@ -1,0 +1,51 @@
+{
+    "nodes": [
+        {
+            "name": "deaths",
+            "n": 1,
+            "grp": 1,
+            "id": "deaths"
+        },
+        {
+            "name": "limit",
+            "n": 2,
+            "grp": 1,
+            "id": "limit"
+        },
+        {
+            "name": "pedestrian",
+            "n": 3,
+            "grp": 1,
+            "id": "pedestrian"
+        },
+        {
+            "name": "posted",
+            "n": 4,
+            "grp": 1,
+            "id": "posted"
+        },
+        {
+            "name": "speed",
+            "n": 5,
+            "grp": 1,
+            "id": "speed"
+        }
+    ],
+    "links": [
+        {
+            "source": "deaths",
+            "target": "pedestrian",
+            "value": 9
+        },
+        {
+            "source": "posted",
+            "target": "speed",
+            "value": 12
+        },
+        {
+            "source": "speed",
+            "target": "limit",
+            "value": 25
+        }
+    ]
+}
