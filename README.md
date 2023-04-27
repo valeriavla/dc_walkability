@@ -1,45 +1,51 @@
-# ANLY 503 Project Repo
+# A Visual Exploration of Walkability in Washington, D.C.
 
-This is the team repository you will be use for your 503 project. All your team's work will happen here. 
+## Team
 
-Links of interest:
-* The project requirements are in the [`instructions.md`](instructions.md) document
-* The repository structure is described in the [reposity structure section](#repository-structure) below
-* You **will** make changes to this `README.md` file within your repository. These changes are descripned in the [instructions section](#instructions-for-modifying-this-readmemd-file) below.
+Team 14 is comprised of: 
+* Corrina Calanoc
+* Cynthia Ng
+* Katherine Mead
+* Madelyne Ventura
+* Valeria Vera Lagos
 
-## Repository structure
+## Executive Summary 
 
-You will work within an **organized** repository and apply coding and development best practices. The repository has the following structure:
+Walkability is the ease with which people can access amenities in a place without the use of cars. It is associated with positive outcomes in health, community, sustainability, and the economy. A report by the Institute for Transportation and Development Policy evaluated the walkability of major global cities and the only city to make the top 25 in any category was Washington, D.C. This project aims to provide a visual narrative that overviews the *walks through* the following research questions:
+
+Research Questions:
+
+1. How is walkability associated with socioeconomic and health outcomes?
+2. How accessible are neighborhoods by bike?
+3. What is public sentiment around walkability and driving
+
+## Website
+
+These visualizations as well as a more detailed write-up of the problem statement can be found at: https://valeriavl.georgetown.domains/503/
+
+### Repository structure
+This repository has the following structure:
 
 ```.
 ├── README.md
 ├── code/
 ├── data/
+├──── /cleaned_data/
 ├── img/
 └── website/
 ```
 
-* The `code/` directory is where you will develop all your code.  You may add additional sub-directories as needed to modularize your development.
+## Code
 
-* The `data/` directory should contain your data files and should have multiple sub-directories (i.e. raw, processed, analytical, etc.) as needed.
+## Files
 
-* The `img/` directory should contain any external images that you need for your site. However, all your viz's should be generated programmatically in your source code.
+## Datasets
+All data used for this project can be found within the `/data` directory. Unmodified raw data can be found within `/data/raw_data`, and any data that was manipulated and cleaned for the purpose of visualizations can be found within `data/cleaned_data`. Since majority of the raw data files were so large, they have been compressed in order to make it easier for hosting online. Descriptions of each dataset and its associated files:
 
-* The `website/` directory where the website will be deployed. It must be self-contained and accessible via an index.html within this sub-directory.  Any website asset (images, html, css, JavaScript source code) must be added to this directory. 
-
-There is an empty placeholder file in each subdirectory called `placeholder-to-be-deleted.txt`. This file may be deleted **after** you save other files in those subdirectories. This file is needed to be able to keep the empty directory in the repo.
-
-Other files we expect to see at the top level of this repo may include:
-- `.gitignore`
-
-
-## Instructions for modifying this `README.md` file
-
-The README.md file in a repository usually contains additional information about your project. Currently this file contains information about the repository structure. However, for the wip and final submissions, you will make the following changes to this file:
-
-* You can delete the current content of the `README.md` file
-* Add a project title section
-* Add your team section with your team number and team member names
-* Add an executive summary section describing your project
-* Provide a description of all your code files, datasets, etc.
+* Dataset name: [EPA's Walkability Index](https://catalog.data.gov/dataset/walkability-index)
+  * `data/raw_data/EPA_SmartLocationDatabase_V3_Jan_2021_Final.csv`
+    * Large datafile has been compressed. This contains all of the walkability index scores for every Census Block in the United States. 
+* Dataset Name: [U.S. Census Bureau Community Resilience Estimates](https://www.census.gov/programs-surveys/community-resilience-estimates.html)
+  * `data/raw_data/cre_equity_census_tract_data.csv`
+    * Large datafile has been compressed. This contains socioeconomic outcomes for every Census Block in the United States.
 
