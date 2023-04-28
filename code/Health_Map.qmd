@@ -12,8 +12,14 @@ format:
         code-fold: true
 ---
 
+# Health Outcomes in Washington, D.C.--Cross-comparison and Walkability Data
 
-Relevant libraries were imported:
+- [**PLACES Small Area Health Estimates dataset**](https://www.cdc.gov/places/index.html): This dataset contains model-based census tract level estimates for PLACES 2022 release. PLACES covers the entire United States at county, place, census tract, and ZIP Code Tabulation Area levels. The estimates provided by CDC's Division of Population Health, Epidemiology and Surveillance Branch. The data sources used were Behavioral Risk Factor Surveillance System (BRFSS) 2020/2019, Census Bureau 2010 population estimates, and American Community Survey (ACS) 2015-2019 estimates. The dataset contains 29 unique health measures.
+- [**Washington, D.C. Census GeoJSON**](https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson): This dataset contains geolocation data for Washington DC census tracts.
+- [**Washington, D.C. Walkability Scores**]: This dataset is described in the walkbility plot section of this report.
+
+
+### Data Cleaning:
 
 ```{python}
 # IMPORT RELEVANT LIBRARIES
@@ -31,22 +37,7 @@ import numpy as np
 import scipy.stats
 import plotly.subplots as sp
 from pathlib import Path
-```
 
-
-
-
-# Association Between Health Factors
-
-- Source: PLACES Census Health Data Estimation
-- Dataset contains model-based census tract level estimates for PLACES 2022 release.
-PLACES covers the entire United States at county, place, census tract, and ZIP Code Tabulation Area levels.
-- Estimates provided by CDC's Division of Population Health, Epidemiology and Surveillance Branch
-- Data sources used are Behavioral Risk Factor Surveillance System (BRFSS) 2020/2019, Census Bureau 2010 population estimates, and American Community Survey (ACS) 2015-2019 estimates.
-- 29 measures can be mapped at the census tract level using GIS systems
-
-
-```{python}
 # import the csv
 dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
 
@@ -103,7 +94,12 @@ df = df.rename(columns={'ACCESS2_CrudePrev': '% of Adults without Health Insuran
 
 # list of health metrics for drop down menu
 column_names = df.columns
+```
 
+
+## Association Between Health Factors
+
+```{python}
 # Creating the initial scatter plot
 fig = go.Figure(go.Scatter(x=df[column_names[0]], y=df[column_names[1]], mode='markers'))
 
@@ -243,10 +239,7 @@ fig.show()
 
 ```
 
-
-# Walkability as a Predictor of Health
-
-- PLACES data was joined with Census-tract level walkability scores for DC neighborhoods
+## Data Cleaning
 
 ```{python}
 # Import walkability data
@@ -308,6 +301,13 @@ column_names = df.columns
 
 # # Alter walkability score to 0 to 100
 df['walkability_score'] = (df['walkability_score'] - df['walkability_score'].min()) / (df['walkability_score'].max() - df['walkability_score'].min()) * 100
+```
+
+
+## Walkability as a Predictor of Health
+
+```{python}
+
 
 # Setting the range for x and y axes
 #fig.update_xaxes(range=[0, 100])
@@ -348,7 +348,7 @@ y_axis_dropdown = go.layout.Updatemenu(
     direction="down",
     pad={"r": 10, "t": 10},
     showactive=True,
-    x=0.06,
+    x=0.1,
     xanchor="left",
     y=button_layer_1_height,
     yanchor="top"
@@ -363,8 +363,8 @@ fig.update_layout(
 )
 
 # Label axes
-fig.update_xaxes(title_text='X Axis')
-fig.update_yaxes(title_text='Y Axis')
+fig.update_xaxes(title_text='Walkability score of neighborhood (% Normalized)')
+fig.update_yaxes(title_text='Adults without health insurance (%)')
 
 
 
@@ -420,9 +420,29 @@ fig.update_layout(
     font=dict(family='Proxima Nova')
 )
 
-fig.update_xaxes(range=[0, 100])
-fig.update_yaxes(range=[0, 100])
+# fig.update_layout(font=dict(size=18))
+
+# fig.update_xaxes(range=[0, 100])
+# fig.update_yaxes(range=[0, 25])
 
 # Display the scatter plot with dropdown menus
 fig.show()
 ```
+
+# Walkability and Health
+
+- ties into data science question of how does walkability impact well-being?
+- cannot determine causation
+- walkability associated with better health outcomes and lower rates of disease
+- future research could complete more statistical analyses to determine the relationship between income, walkability of neighborhoods, and health.
+
+## Description of Plots
+
+- first scatterplot allows for toggling both x and y axes to see how different health outcomes are associated with each other
+- certain health outcomes show a strong positive correlation (e.g. high blood pressure and diabetes) but more research will be needed to consider all causal factors and mechanisms connecting the health outcomes
+- second scatterplot allows for toggling the y axis to see how walkability is associated with health outcomes
+- in general, a neighborhood with a higher walkability score has better health outcomes
+
+## Findings
+- examining data at the census tract level can provide a lot of helpful information about the overall health picture of Washington, D.C.
+- many variables show a strong relationship with walkability, but more investigation is needed to determine solutions 
