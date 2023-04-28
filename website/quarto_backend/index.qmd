@@ -13,9 +13,10 @@ To explore this topic further, we aim to answer the following data science quest
 1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
 2. How is walkability associated with health outcomes in Washington, D.C.?
 3. How accessible are neighborhoods in Washington, D.C. by bike? 
-4. What is public sentiment around walkability in Washington, D.C.? 
+4. What is metro ridership in Washington, D.C. like?
+5. What is public sentiment around walkability in Washington, D.C.?
 
-We answer these questions by first collecting, cleaning, and exploring US Census Tract, Capital Bike Share, PLACES Census Health Data Estimation, and Reddit data. Based on our initial data exploration, we investigate the ease of access of different neighborhoods, or census tracts, by foot, which is our primary measure of walkability. We also explore the correlation between walkability in different tracts and social and health outcomes. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic. 
+We answer these questions by first collecting, cleaning, and exploring US Census Tract, Capital Bike Share, PLACES Census Health Data Estimation, Washington Metro (WMATA) ridership, and Reddit data. Based on our initial data exploration, we investigate the ease of access of different neighborhoods, or census tracts, by foot, which is our primary measure of walkability. We also explore the correlation between walkability in different tracts and social and health outcomes. We then proceed to investigate the ease of access of tracts by bike by examining the distribution of Capital Bike Share stations and buffered bike lanes throughout the city. Next, we look at the usage of the WMATA metro. Finally, we check sentiment around walkability in the city by analyzing Reddit threads related to this topic. 
 
 To learn more about the methodology, please visit our methods page. 
 
@@ -817,8 +818,79 @@ The trends highlighted by our visual plot indicate that the D.C. Department of T
 Our visualization highlights that while D.C. has come a long way in providing bikeshare and bike lane access, improvements can be made by creating bike stations and bike lanes across adjacent neighborhoods. With these improvements, individuals from all backgrounds looking to enjoy what D.C. has to offer outside of just downtown will one day be able to this with a bike!
 
 
+## 4. What is metro ridership in Washington, D.C. like?
 
-## 4. What is public sentiment around walkability in Washington, D.C.? 
+```{python}
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime as dt
+
+# Read in data
+df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
+
+# Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
+df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
+
+# Convert Date_This_Year column to datetime
+# Remove the "No" string from Date_This_Year column
+df['Date_This_Year'] = df['Date_This_Year'].str.replace('No', '')
+
+# Convert Date_This_Year column to datetime
+
+# Rename Date_This_Year column to Date
+df = df.rename(columns={'Date_This_Year': 'Date'})
+
+# Rename Entries_This_Year column to Entries
+df = df.rename(columns={'Entries_This_Year': 'Entries'})
+
+# Build interactive timeseries plot using plotly
+
+# Import libraries
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Pivot data
+pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
+
+# List all stations
+stations = list(pivot_df.columns)
+
+# Create subplot with one trace per station
+fig = make_subplots(rows=1, cols=1)
+for station in stations:
+    fig.add_trace(
+        go.Scatter(x=pivot_df.index, y=pivot_df[station], name=station),
+        row=1, col=1
+    )
+
+# Create dropdown menu to select station
+buttons = []
+for station in stations:
+    buttons.append(
+        dict(method='update', label=station, args=[{'visible': [station == s for s in stations]}])
+    )
+dropdown = dict(
+    active=0, buttons=buttons, direction='down', showactive=True, x=1.1, y=1.1
+)
+
+# Update layout
+fig.update_layout(
+    updatemenus=[dropdown], height=600, width=900,
+    title='WMATA Metro Entries by Selected Station and Date in March 2023', xaxis_title='Date', yaxis_title='Entries',
+    yaxis=dict(range=[0, 3500]),
+    xaxis=dict(tickangle=45, dtick=5)
+)
+
+# Show plot
+fig.show()
+```
+
+
+
+## 5. What is public sentiment around walkability in Washington, D.C.? 
 
 Following the above analysis, we wanted to gauge public sentiment around walkability in Washington, D.C. to see if that sheds light on our quantitative findings. We first want to observe the most frequent words across categories. Sentiment analysis of user comments is a crucial tool for comprehending socially relevant issues like transportation and walkability of cities, which can help guide decisions that improve the quality of life for locals, workers, and visitors alike. By analyzing the sentiment of user opinions, we can gain a deeper understanding of how people feel about these factors and how they impact their ability and willingness to transit in a particular city. For instance, sentiment analysis can show whether people feel safe walking through particular neighborhoods or whether they find it simple to get to bike lanes or public transportation. Additionally, sentiment analysis can be used to find neighborhoods that are more walkable for particular groups of people or where certain amenities are lacking, as well as places where there are disparities in walkability. Cities can work to build more equitable and inclusive communities by addressing these disparities. In this work we gathered reddit user's opinions for different transportation and walkability topics in D.C. the topics are related to vehicles, bicycle and walkability.
 
