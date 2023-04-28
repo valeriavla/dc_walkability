@@ -175,9 +175,14 @@ connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
 tmp2 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
 tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
 
+# Create boolean columns for rideable type and membet type
+tmp2['classic_bike'] = np.where(tmp2['rideable_type'] == 'classic_bike', 1, 0)
+tmp2['electric_bike'] = np.where(tmp2['rideable_type'] == 'electric_bike', 1, 0)
+tmp2['docked_bike'] = np.where(tmp2['rideable_type'] == 'docked_bike', 1, 0)
+
 # Temporary dataframe showing unique station locations with ride count
-tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
-tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id', 'classic_bike', 'electric_bike', 'docked_bike']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count', 'classic_bike': 'sum', 'electric_bike':'sum', 'docked_bike':'sum'}).reset_index()
+tmp2.rename(columns= {'ride_id':'count_rides', 'classic_bike': 'count_classic', 'electric_bike': 'count_electric', 'docked_bike': 'count_dock'}, inplace = True)
 tmp2['color'] = 'Bike Station'
 
 points = alt.Chart(tmp2).mark_circle().encode(
@@ -186,9 +191,13 @@ points = alt.Chart(tmp2).mark_circle().encode(
     color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
     size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
     order=alt.Order("count_rides:Q", sort="descending"),
-    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
-             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
-             alt.Tooltip('count_rides:Q', title='Ride Count')
+    tooltip=[
+             alt.Tooltip('start_station_id:Q', title='\U0001f4cd Start Station ID'),
+             alt.Tooltip('start_station_name:N', title='\U0001f6e3 Start Station Name'),
+             alt.Tooltip('count_rides:Q', title='\U0001f50d Ride Count'),
+             alt.Tooltip('count_classic:Q', title='\U0001f6b4 Classic Bike Count'),
+             alt.Tooltip('count_electric:Q', title='\U0001f6b5 Electric Bike Count'),
+             alt.Tooltip('count_dock:Q', title='\U0001f6b2 Docked Bike Count')
              ]
 ).add_selection(
     select_station
