@@ -653,36 +653,7 @@ import warnings
 from pathlib import Path
 warnings.filterwarnings('ignore')
 
-# Read in data
-
-data_dir = Path().absolute().parent.absolute().parent/"data"
-img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
-
-bikeshare_df = pd.read_csv(data_dir/"202303-capitalbikeshare-tripdata.csv")
-
-# Convert dates into datetime format
-bikeshare_df['started_at'] = pd.to_datetime(bikeshare_df['started_at'])
-bikeshare_df['ended_at'] = pd.to_datetime(bikeshare_df['ended_at'])
-
-# Drop rides with NaN values
-bikeshare_df.dropna(subset=['start_station_name'], inplace = True)
-bikeshare_df.dropna(subset=['end_station_name'], inplace = True)
-
-# Standardize longitude and latitude using start station
-bikeshare_df['start_lng'] = bikeshare_df['start_lng'].groupby(bikeshare_df['start_station_id']).transform('max')
-bikeshare_df['start_lat'] = bikeshare_df['start_lat'].groupby(bikeshare_df['start_station_id']).transform('max')
-
-# Create dataframe for joining
-tmp = bikeshare_df[['start_station_id', 'start_lng','start_lat']]
-tmp.drop_duplicates(inplace = True)
-
-# Merge using the common station id value
-bikeshare_df = bikeshare_df.merge(tmp, left_on = 'end_station_id', right_on = 'start_station_id')
-
-# Drop repeated columns and rename them
-bikeshare_df.drop(columns = ['end_lat', 'end_lng', 'start_station_id_y'], inplace = True)
-bikeshare_df.rename(columns = {'start_lat_x': 'start_lat', 'start_lng_x': 'start_lng', 'start_lat_y': 'end_lat', 'start_lng_y':'end_lng', 'start_station_id_x': 'start_station_id'}, inplace = True)
-
+bikeshare_df = pd.read_csv(Path().absolute().parent.absolute().parent/"data/cleaned_data/bikeshare_cleaned.csv")
 # Create list of bikeshare stations outside of DC
 nondc_stations = [
     32256,32251,32237,32241,32210,32225,32259,32223,32209,32240,32239,32245,32220,32214,32219,
@@ -801,6 +772,7 @@ points = alt.Chart(tmp2).mark_circle().encode(
 # Show visualization
 (background + background_lanes + connections + points).configure_view(stroke=None)
 ```
+
 
 Following our exploration of the relationship between a neighborhood's walkability score and its socioeconomic and health outcomes, we wanted to explore another dimension of walkability - ease of access of bikes. To do this, we explored the distribution of Capital Bikeshare stations and bike lanes across Washington, D.C.. 
 
