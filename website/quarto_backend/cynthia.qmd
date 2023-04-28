@@ -1,0 +1,141 @@
+---
+title: "Untitled"
+format: html
+---
+
+## Index.qmd
+### 4. What is metro ridership in Washington, D.C. like?
+
+```{python}
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Read in data
+df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
+
+# Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
+df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
+
+# Rename columns 
+df = df.rename(columns={'Date_This_Year': 'Date'})
+df = df.rename(columns={'Entries_This_Year': 'Entries'})
+
+# Pivot data
+pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
+
+# Convert index of pivot_df to datetime
+pivot_df.index = pd.to_datetime(pivot_df.index)
+
+# Organize index of pivot_df from earliest to latest date
+pivot_df = pivot_df.sort_index()
+
+# Select stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from pivot_df
+new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U', 'Gallery Place', 'Capitol South']]
+
+
+# Save pivot_df and new_df to csv
+pivot_df.to_csv('../../data/cleaned_data/wmata_cleaned.csv')
+new_df.to_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+
+########## Index.qmd
+# Build interactive timeseries plot using plotly
+# Import libraries
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Read in wmata_new_cleaned.csv
+# new_df = pd.read_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+
+# List all stations
+stations = list(new_df.columns)
+
+# Create subplot with one trace per station
+fig = make_subplots(rows=1, cols=1)
+for station in stations:
+    fig.add_trace(
+        go.Scatter(x=new_df.index, y=new_df[station], name=station),
+        row=1, col=1
+    )
+
+# Create dropdown menu to select station
+buttons = []
+for station in stations:
+    buttons.append(
+        dict(method='update', label=station, args=[{'visible': [station == s for s in stations]}])
+    )
+dropdown = dict(
+    active=0, buttons=buttons, direction='down', showactive=True, x=1.1, y=1.1
+)
+
+# Update layout
+fig.update_layout(
+    updatemenus=[dropdown], height=600, width=900,
+    title='WMATA Metro Entries by Selected Station and Date in March 2023', xaxis_title='Date', yaxis_title='Entries',
+    yaxis=dict(range=[0, 3000])
+)
+
+# Show plot
+fig.show()
+```
+
+After analyzing accessibility by foot and bike, we wanted to explore another dimension of walkability--the metro. In Washington, D.C. the metro is established and managed by the Washington Metropolitan Area Transit Authority (WMATA).
+
+The plotly graph above shows the number of entries at the metro stations in the Washington, D.C. area in March 2023. The data is from the Metrorail Ridership Year-over-Year Change data [here](https://www.wmata.com/initiatives/ridership-portal/Metrorail-Ridership-Year-over-Year-Change.cfm). The graph shows number of entries at a station on various days in March 2023. Initially, the plot shows all stations' entries by day. The legend at the right shows you the six different stations for which there is ridership data. The plot is interactive, so you can select a specific station at the dropdown menu at the top right corner. Upon selecting it, the graph will reflect the selected station's entries by day. You can also hover over each line where a tooltip will reveal the selected day and station as well as the number of entries accordingly. The graph is also zoomable, so you can zoom in and out to see the data more clearly.
+
+Overall, we see that there is a weekly pattern in ridership, where generally there are more entries on weekdays than weekends across almost all stations. This is perhaps due to the use of the metro to commute to work and activites on weekdays. Furthermore, we also observe that Gallery Place and Capitol South, which are located in tracts with higher walkability scores according to Census data have higher ridership, have significantly higher ridership than the other stations. On the contrary, Anacostia, Stadium-Armory, and Van Ness-UDC, which are located in tracts with lower walkability scores according to Census data have lower ridership. This makes sense, because stations with higher ridership are likely to be located in more walkable neighborhoods where amenities like public transport are more well-connected and accessible, whereas the opposite is the case for less walkable neighborhoods. Note also that Capitol South is located on Capitol Hill, which is a major tourist attraction and office area in Washington, D.C. and Gallery Place is located in Chinatown, which is also a major tourist attraction. These are less residential neighborhoods. 
+
+The data is limited in that there is no data on exits at a station, so the data only shows one direction of a journey––though it is appropriate to assume that a rider will likely exit at the station at the end of the day. Furthermore, the data is limited in that it only shows data for one month in 2023, so it is not representative of ridership in other months or years. However, it is still useful to see the ridership patterns in March 2023.
+
+## Methods.qmd
+## 4. What is metro ridership in Washington, D.C. like?
+
+### 4.1 Data Collection
+
+To obtain information about metro ridership, we went to WMATA, which has its own ridership data portal. The data is collected from the Metrorail Ridership Year-over-Year Change dashboard [here](https://www.wmata.com/initiatives/ridership-portal/Metrorail-Ridership-Year-over-Year-Change.cfm). Only data for March 2023 is available, so then we went to the download button in the bottom right corner of the platform to downoload this data. For more information about the data collection method, please reach out to "planning_ridership@wmata.com".
+
+### 4.2 Data Cleaning
+
+In answering this question, we built an interactive timeseries plot of the Washington Metropolitan Area Transit Authority (WMATA) Metro entries by selected station and date in March 2023 using the Plotly library. Then, we cleaned the data by renaming the 'Date_This_Year' and 'Entry_This_Year' columns to 'Date' and 'Entries' respectively for clarity. We also pivoted the dataframe so that number of entries are shown by station in columns and date in rows. Then, we converted the index column, which contains the dates, to datetime format. We also organized the index from earliest to latest date. Finally, we selected the stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from the dataframe because the first three neighborhoods correspond to three of the least walkable neighborhoods in Washington, D.C. and the last three neighborhoods correspond to the most walkable neighborhoods. Otherwise, if we included all stations' data, the plot would be too crowded and confusing. We saved the cleaned data to a csv file.
+
+```{python}
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Read in data
+df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
+
+# Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
+df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
+
+# Rename columns 
+df = df.rename(columns={'Date_This_Year': 'Date'})
+df = df.rename(columns={'Entries_This_Year': 'Entries'})
+
+# Pivot data
+pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
+
+# Convert index of pivot_df to datetime
+pivot_df.index = pd.to_datetime(pivot_df.index)
+
+# Organize index of pivot_df from earliest to latest date
+pivot_df = pivot_df.sort_index()
+
+# Select stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from pivot_df
+new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U', 'Gallery Place', 'Capitol South']]
+
+
+# Save pivot_df and new_df to csv
+pivot_df.to_csv('../../data/cleaned_data/wmata_cleaned.csv')
+new_df.to_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+```
+
+
+### 4.3 Data Visualization
+
+Using the cleaned data, we built an interactive time series plot using the plotly.graph_objects and plotly.subplots libraries. We read in the cleaned data (wmata_new_cleaned.csv) and created a list of all the unique station names in the dataset. We created a subplot with one trace per station and used a for loop to iterate through each unique station in the dataset, adding the corresponding trace to the subplot. Then, we created a dropdown menu to allow users to input a station from the list of stations available. Each station is represented in a button. When a user picks a station by selecting the corresponding button, the method updates the visibility of the trace to reflect the entries by day at the selected station. The layout of the plot is updated to include the dropdown menu and to set the title, axis labels, and fixed axis ranges. The fig.show() method to display the plot.
