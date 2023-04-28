@@ -14,7 +14,7 @@ We first read in the PLACES Census Tract Data and conduct some basic cleaning, s
 
 ### 3. How accessible are neighborhoods in Washington, D.C. by bike?
 
-#### Data Collection
+#### 3.1 Data Collection
 
 Bike lanes and the Capital Bikeshare program are two major initiatives for improving quality of life and transportation access in D.C. by the D.C. Department of Transportation. Since these two initiatives go hand in hand, we decided to analyze them together in a single visualization. For this analysis we collected the following datasets:
 
@@ -22,7 +22,7 @@ Bike lanes and the Capital Bikeshare program are two major initiatives for impro
 - [**U.S. Census Tract D.C. GeoJSON**](https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson): This file is the GeoJSON map file created by the U.S. Census Bureau for Washington, D.C.. It includes a geographical information regarding the location of each neighborhood in Washington, D.C.
 - [**Open Data DC Bike Lane GeoJSON**](https://opendata.dc.gov/datasets/DCGIS::bicycle-lanes/explore?location=38.877487%2C-76.976765%2C12.88): This GeoJSON file provided by the D.C. Government provides geographical information regarding the various bike lanes located throughout the city.
 
-#### Data Cleaning
+#### 3.2 Data Cleaning
 
 Since the goal of this visualization was the show both the bike lane and bikeshare data on a single map, we cleaned the datasets to put them in the proper format. In the Capital Bikeshare dataset, each trip's latitude and longitude was recorded from the point where the bike was activated at the dock. This meant that even though various rides started at the same bike dock, there were small variations in the recorded latitudes and longitudes. Thereforem, the latitude and longitude values were standardized for each bike station. Additionally, the bikeshare dataset contained data for the entire Washington D.C. metro area and since we focused our analysis to D.C. only, stations outside of the D.C. boundary were removed. Finally, any rows with incomplete trip values were removed. 
 
@@ -73,7 +73,7 @@ bikeshare_df.to_csv(Path().absolute().parent.absolute().parent/"data/cleaned_dat
 ```
 
 
-#### Data Visualization
+#### 3.3 Data Visualization
 
 In the `Altair` plot, we combined March 2023 Capital Bikeshare Data with D.C. geographical data to create a layered visual. The geographical layout is a map of D.C. with each neighborhood outlined by white. Each point represents a Capital Bikeshare Station with the size representing the amount of trips starting from that station in the month of March. The yellow lines represent the bike lanes created by the D.C. government on public streets. When the user hovers over any station, the visual will show black network lines (or edges) that connect that station ("start" station) to other stations ("end" stations), representing where people have traveled to with the Capital Bikeshare bikes. We also included tooltips that display the station information and appear when a user hovers over a station.
 

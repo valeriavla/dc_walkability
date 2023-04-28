@@ -792,63 +792,7 @@ Our visualization highlights that while D.C. has come a long way in providing bi
 
 ## 4. What is metro ridership in Washington, D.C. like?
 
-```{python}
-# Import libraries
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-# Read in data
-df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
-
-# Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
-df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
-
-# Rename columns 
-df = df.rename(columns={'Date_This_Year': 'Date'})
-df = df.rename(columns={'Entries_This_Year': 'Entries'})
-
-# Build interactive timeseries plot using plotly
-# Import plotly libraries
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-
-# Pivot data
-pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
-
-# List all stations
-stations = list(pivot_df.columns)
-
-# Create subplot with one trace per station
-fig = make_subplots(rows=1, cols=1)
-for station in stations:
-    fig.add_trace(
-        go.Scatter(x=pivot_df.index, y=pivot_df[station], name=station),
-        row=1, col=1
-    )
-
-# Create dropdown menu to select station
-buttons = []
-for station in stations:
-    buttons.append(
-        dict(method='update', label=station, args=[{'visible': [station == s for s in stations]}])
-    )
-dropdown = dict(
-    active=0, buttons=buttons, direction='down', showactive=True, x=1.1, y=1.1
-)
-
-# Update layout
-fig.update_layout(
-    updatemenus=[dropdown], height=600, width=900,
-    title='WMATA Metro Entries by Selected Station and Date in March 2023', xaxis_title='Date', yaxis_title='Entries',
-    yaxis=dict(range=[0, 3500]),
-    xaxis=dict(tickangle=45, dtick=5)
-)
-
-# Show plot
-fig.show()
-```
 
 
 ## 5. What is public sentiment around walkability in Washington, D.C.? 
