@@ -1,0 +1,203 @@
+---
+title: "Methods"
+---
+
+## Methods
+
+
+## Data Collection
+
+Bike lanes and the Capital Bikeshare program are two major initiatives for improving quality of life and transportation access in D.C. by the D.C. Department of Transportation. Since these two initiatives go hand in hand, we decided to analyze them together in a single visualization. For this analysis we collected the following datasets:
+
+- [**Capital Bikeshare Trip Data for March 2023**](https://s3.amazonaws.com/capitalbikeshare-data/index.html): This dataset compiles all of the Capital Bikeshare trips completed by riders in the Washington D.C. metro area. It contains information such as `start_at`: starting bike dock, `ended_at`: ending bike dock, `start_station_name`: street name information for starting dock station, `end_station_name`: street name information for end dock station. It also includes the latitude and longitude information for the start and end locations of the rider's trip.
+- [**U.S. Census Tract D.C. GeoJSON**](https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson): This file is the GeoJSON map file created by the U.S. Census Bureau for Washington, D.C.. It includes a geographical information regarding the location of each neighborhood in Washington, D.C.
+- [**Open Data DC Bike Lane GeoJSON**](https://opendata.dc.gov/datasets/DCGIS::bicycle-lanes/explore?location=38.877487%2C-76.976765%2C12.88): This GeoJSON file provided by the D.C. Government provides geographical information regarding the various bike lanes located throughout the city.
+
+## Data Cleaning
+
+Since the goal of this visualization was the show both the bike lane and bikeshare data on a single map, we cleaned the datasets to put them in the proper format. In the Capital Bikeshare dataset, each trip's latitude and longitude was recorded from the point where the bike was activated at the dock. This meant that even though various rides started at the same bike dock, there were small variations in the recorded latitudes and longitudes. Thereforem, the latitude and longitude values were standardized for each bike station. Additionally, the bikeshare dataset contained data for the entire Washington D.C. metro area and since we focused our analysis to D.C. only, stations outside of the D.C. boundary were removed. Finally, any rows with incomplete trip values were removed. 
+
+The GeoJSON files did not undergo any processing and therefore were used as-is.
+
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+import plotly.graph_objects as go
+from vega_datasets import data
+import requests
+import json
+import warnings
+from pathlib import Path
+warnings.filterwarnings('ignore')
+
+# Read in data
+
+data_dir = Path().absolute().parent.absolute().parent/"data"
+img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+
+bikeshare_df = pd.read_csv(data_dir/"202303-capitalbikeshare-tripdata.csv")
+
+# Convert dates into datetime format
+bikeshare_df['started_at'] = pd.to_datetime(bikeshare_df['started_at'])
+bikeshare_df['ended_at'] = pd.to_datetime(bikeshare_df['ended_at'])
+
+# Drop rides with NaN values
+bikeshare_df.dropna(subset=['start_station_name'], inplace = True)
+bikeshare_df.dropna(subset=['end_station_name'], inplace = True)
+
+# Standardize longitude and latitude using start station
+bikeshare_df['start_lng'] = bikeshare_df['start_lng'].groupby(bikeshare_df['start_station_id']).transform('max')
+bikeshare_df['start_lat'] = bikeshare_df['start_lat'].groupby(bikeshare_df['start_station_id']).transform('max')
+
+# Create dataframe for joining
+tmp = bikeshare_df[['start_station_id', 'start_lng','start_lat']]
+tmp.drop_duplicates(inplace = True)
+
+# Merge using the common station id value
+bikeshare_df = bikeshare_df.merge(tmp, left_on = 'end_station_id', right_on = 'start_station_id')
+
+# Drop repeated columns and rename them
+bikeshare_df.drop(columns = ['end_lat', 'end_lng', 'start_station_id_y'], inplace = True)
+bikeshare_df.rename(columns = {'start_lat_x': 'start_lat', 'start_lng_x': 'start_lng', 'start_lat_y': 'end_lat', 'start_lng_y':'end_lng', 'start_station_id_x': 'start_station_id'}, inplace = True)
+bikeshare_df.to_csv(Path().absolute().parent.absolute().parent/"data/cleaned_data/bikeshare_cleaned.csv", index = False)
+```
+
+## Data Visualization
+
+In the `Altair` plot, we combined March 2023 Capital Bikeshare Data with D.C. geographical data to create a layered visual. The geographical layout is a map of D.C. with each neighborhood outlined by white. Each point represents a Capital Bikeshare Station with the size representing the amount of trips starting from that station in the month of March. The yellow lines represent the bike lanes created by the D.C. government on public streets. When the user hovers over any station, the visual will show black network lines (or edges) that connect that station ("start" station) to other stations ("end" stations), representing where people have traveled to with the Capital Bikeshare bikes. We also included tooltips that display the station information and appear when a user hovers over a station.
+
+```{python}
+import pandas as pd
+import numpy as np
+import altair as alt
+import plotly.graph_objects as go
+from vega_datasets import data
+import requests
+import json
+import warnings
+from pathlib import Path
+warnings.filterwarnings('ignore')
+
+bikeshare_df = pd.read_csv(Path().absolute().parent.absolute().parent/"data/cleaned_data/bikeshare_cleaned.csv")
+# Create list of bikeshare stations outside of DC
+nondc_stations = [
+    32256,32251,32237,32241,32210,32225,32259,32223,32209,32240,32239,32245,32220,32214,32219,
+    32224,32217,32213,32239,32246,32247,32250,32248,32246,32228,32215,32238,32252,32249,32260,
+    32234,32231,32235,32255,32200,32208,32201,32211,32227,32207,32229,32221,32206,32233,32205,
+    32204,32205,32203,32206,32222,32230,32232,32600,32602,32603,32608,32605,32604,32607,32609,
+    31948,31904,32606,32601,31921,31905,31902,31901,31976,31036,31977,31900,31920,31049,31037,
+    31926,31919,31035,31973,31069,31023,31022,31021,31019,31020,31094,31092,31079,31030,31029,
+    31080,31093,31014,31062,31077,31073,31024,31040,31028,31017,31924,31027,31947,31066,31075,
+    31949,31053,31971,31067,31058,31923,31063,31068,31951,31945,31095,31006,31005,31091,31004,
+    31936,31071,31090,31950,31064,31935,31011,31012,31009,31944,31052,31010,31959,31916,31088,
+    31960,31956,31910,31083,31915,31087,31085,31913,31915,31970,31969,31906,31098,31048,31081,
+    31084,31082,31974,31930,31932,31953,31942,31967,32406,32423,32415,32407,32405,32401,32400,
+    32405,32404,32413,32418,32410,32403,32408,32421,32402,32417,32422,32420,32414,32412,32416,
+    32059,32061,32026,32011,32049,32082,32058,32025,32001,32058,32082,32024,32043,32036,32012,
+    32034,32035,32050,32056,32426,32425,32424,32426,32085,32094,32089,32093,32091,32090,32087,
+    32088,32086,32092,32022,32066,32064,32062,32065,32073,32063,32084,32054,32051,32040,32046,
+    32029,32055,32002,32021,32003,32048,32013,32000,32008,32028,32027,32053,32039,32057,32078,
+    32075,32077,32076,32079,32080,32074,32081,32032,32047,32044,32017,32007,32009,32023,32033,
+    32016,32004,32005,32072,32041,32052,32071,32038,32037,32045,32067,32069,32068,32018,32253,
+    32236,32243,32258,32216,32212,32218,32019,32411,31929,31914,31907,31903,31958,31933,31041,
+    31042,31968,31044,31045,31955,31046,31047,31099,31043,31097,31931,31918,31086,31927,31966,
+    21943,31963,31952,31964,31962,31908,31072,31941,31961,31928,31054,31033,31059,31057,31061,
+    31056,31055,31909,31912,31065,31032,31074,31078,32419,31957,31954,31946,31972,31060,31938,
+    31013,31002,31007,31000,31003,31096,31070,31039,31034,31025,31038,31026,31050,31940,31089,
+    31031,31051,31937,31016,31018,31039,31015,31917,31076,31939,32409
+]
+
+alt.data_transformers.enable('default',max_rows=None)
+
+#### BACKGROUND FOR DC MAP 
+
+# Define background of Washington D.C.
+response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+
+background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bike Lanes, Capital Bikeshare Stations, & Routes in March 2023").mark_geoshape(
+        fill="lightgray",
+        stroke='white',
+        strokeWidth=1
+    ).encode(
+    ).properties(
+        width=600,
+        height=600
+    )
+
+#### BACKGROUND FOR DC BIKE LANE LOCATIONS 
+
+# Open GeoJSON file for bicycle lanes
+with open(data_dir/'Bicycle_Lanes.geojson') as f:
+    data = json.load(f)
+
+
+# Create background of D.C.
+background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
+        stroke='#d6a320',
+        strokeWidth=1
+        ).properties(
+        width=600,
+        height=600
+    )
+
+
+
+#### MOUSEOVER SELECTION
+
+# Create mouseover selection
+select_station = alt.selection_single(
+    on="mouseover", nearest=True, fields=["start_station_name"], empty='none'
+)
+
+#### NETWORK CONNECTIONS FOR MAP 
+
+# Filter non-DC stations
+tmp1 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
+tmp1 = tmp1[~tmp1['end_station_id'].isin(nondc_stations)]
+
+# Keep only relevant columns and drop duplicates to have one row per route
+tmp1 = tmp1[['start_station_name', 'start_station_id', 'end_station_name', 'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng']].drop_duplicates()
+
+# Define connections
+connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
+    latitude="start_lat:Q",
+    longitude="start_lng:Q",
+    latitude2="end_lat:Q",
+    longitude2="end_lng:Q"
+).transform_filter(
+    select_station
+)
+
+#### POINTS FOR MAP 
+
+# Filter non-DC stations
+tmp2 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
+tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
+
+# Temporary dataframe showing unique station locations with ride count
+tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
+tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+tmp2['color'] = 'Bike Station'
+
+points = alt.Chart(tmp2).mark_circle().encode(
+    latitude="start_lat:Q",
+    longitude="start_lng:Q",
+    color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
+    size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
+    order=alt.Order("count_rides:Q", sort="descending"),
+    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
+             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
+             alt.Tooltip('count_rides:Q', title='Ride Count')
+             ]
+).add_selection(
+    select_station
+)
+
+
+# Show visualization
+(background + background_lanes + connections + points).configure_view(stroke=None)
+```
+
+
+
