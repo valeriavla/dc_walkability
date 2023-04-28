@@ -826,7 +826,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import datetime as dt
 
 # Read in data
 df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
@@ -834,21 +833,12 @@ df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
 # Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
 df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
 
-# Convert Date_This_Year column to datetime
-# Remove the "No" string from Date_This_Year column
-df['Date_This_Year'] = df['Date_This_Year'].str.replace('No', '')
-
-# Convert Date_This_Year column to datetime
-
-# Rename Date_This_Year column to Date
+# Rename columns 
 df = df.rename(columns={'Date_This_Year': 'Date'})
-
-# Rename Entries_This_Year column to Entries
 df = df.rename(columns={'Entries_This_Year': 'Entries'})
 
 # Build interactive timeseries plot using plotly
-
-# Import libraries
+# Import plotly libraries
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -887,7 +877,6 @@ fig.update_layout(
 # Show plot
 fig.show()
 ```
-
 
 
 ## 5. What is public sentiment around walkability in Washington, D.C.? 
