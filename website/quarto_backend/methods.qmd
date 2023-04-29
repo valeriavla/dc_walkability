@@ -23,6 +23,8 @@ In order to create a clean dataset in the format we wanted, we created a script 
 
 
 ```{python}
+#| eval: false
+
 import altair as alt
 import pandas as pd
 import geopandas as gpd
@@ -161,6 +163,8 @@ merged_df.to_csv(write_data_dir/"cleaned_walkability.csv", index = False)
 Using the Pandas, Geopandas, and Altair libraries, we generated an interactive visualization of walkability and socio-economic outcomes in Washington, D.C. To generate the interactive visualization, we used the Altair library to create a bar chart with tract or neighborhood names on the x-axis, variable names on the y-axis, and variable values as the bar heights. We further aggregate the data at the national level by calculating the average of the variable values for all neighborhoods, and store the aggregated data in a separate dataframe.
 
 ```{python}
+#| eval: false
+
 
 # define data directories
 data_dir = Path().absolute().parent.absolute().parent/"data"
@@ -266,6 +270,8 @@ We obtained PLACES Census Health Data Estimation data. This dataset contains mod
 We first read in the PLACES Census Tract Data and conduct some basic cleaning, such as selecting only data related to Washington, D.C. and renaming columns. Then, to do some basic data exploration, we created an exploratory scatter plot using Plotly, where we can examine the relationship between pairs of user-selected health outcomes in D.C. on the x-axis and y-axis. We used a callback function, update_visibility, to update the visibility of the scatter plot traces based on the selected values from the drop-down menus. 
 
 ```{python}
+#| eval: false
+
 # import the csv
 dc_health_df = pd.read_csv('./PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv')
 
@@ -477,6 +483,8 @@ Since the goal of this visualization was the show both the bike lane and bikesha
 The GeoJSON files did not undergo any processing and therefore were used as-is.
 
 ```{python}
+#| eval: false
+
 import pandas as pd
 import numpy as np
 import altair as alt
@@ -526,6 +534,8 @@ bikeshare_df.to_csv(Path().absolute().parent.absolute().parent/"data/cleaned_dat
 In the `Altair` plot, we combined March 2023 Capital Bikeshare Data with D.C. geographical data to create a layered visual. The geographical layout is a map of D.C. with each neighborhood outlined by white. Each point represents a Capital Bikeshare Station with the size representing the amount of trips starting from that station in the month of March. The yellow lines represent the bike lanes created by the D.C. government on public streets. When the user hovers over any station, the visual will show black network lines (or edges) that connect that station ("start" station) to other stations ("end" stations), representing where people have traveled to with the Capital Bikeshare bikes. We also included tooltips that display the station information and appear when a user hovers over a station.
 
 ```{python}
+#| eval: false
+
 import pandas as pd
 import numpy as np
 import altair as alt
@@ -668,6 +678,8 @@ To obtain information about metro ridership, we went to WMATA, which has its own
 In answering this question, we built an interactive timeseries plot of the Washington Metropolitan Area Transit Authority (WMATA) Metro entries by selected station and date in March 2023 using the Plotly library. Then, we cleaned the data by renaming the 'Date_This_Year' and 'Entry_This_Year' columns to 'Date' and 'Entries' respectively for clarity. We also pivoted the dataframe so that number of entries are shown by station in columns and date in rows. Then, we converted the index column, which contains the dates, to datetime format. We also organized the index from earliest to latest date. Finally, we selected the stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from the dataframe because the first three neighborhoods correspond to three of the least walkable neighborhoods in Washington, D.C. and the last three neighborhoods correspond to the most walkable neighborhoods. Otherwise, if we included all stations' data, the plot would be too crowded and confusing. We saved the cleaned data to a csv file.
 
 ```{python}
+#| eval: false
+
 # Import libraries
 import pandas as pd
 import numpy as np
@@ -711,9 +723,462 @@ Using the cleaned data, we built an interactive time series plot using the plotl
 
 #### 5.1 Data Collection
 
+To collect the sentiment of the public regarding different transportation methods we used the Reddit API to scrap answers to posts using keywords such as "Walkability", "Cars" and "Bicycles". The API would collect the opinions from the thread URL we are scrapping and finally a dataframe was generated with the content of each post.
+
+```{python}
+#| eval: false
+
+import praw
+import pandas as pd
+
+# Creating connection to API 
+reddit_read_only = praw.Reddit(client_id="",
+							client_secret="",
+							user_agent="Walkability_DC")
+
+subreddit = reddit_read_only.subreddit("redditdev")
+
+print("Name:", subreddit.display_name)
+print("Title:", subreddit.title)
+print("Description:", subreddit.description)
+
+# Gather url of predefined topics
+topics = {"bikes":[bikes_urls],
+          "cars":[cars_urls],
+          "walk":[walk_urls],
+        }
+
+# Scrapping data by url
+for key in topics.keys():
+    comments = []
+    for url in topics[key][0]:
+        try:
+                submission = reddit_read_only.submission(url=url)
+        except:
+             print("incorrect url:",url)
+             continue
+        submission.comments.replace_more(limit=0)
+        for comment in submission.comments.list():
+            comments.append(comment.body)
+    topics[key].append(comments)
+
+# Generation of dataframe with all threads per category
+df_reddit = pd.DataFrame(data=[topics["bikes"][1],topics["cars"][1],topics["walk"][1]]).T
+df_reddit = df_reddit.rename(columns={0:"bikes", 1:"cars", 2:"walk"})
+
+df_reddit.to_csv("../data/reddit.csv",index=False)
+```
+
+
 #### 5.2 Data Cleaning
+A Natural Language Analysis was performed to: remove non-letter characters
+```{python}
+#| eval: false
+
+import pandas as pd
+import re
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import tensorflow as tf
+import pandas as pd
+import random
+import numpy as np
+import torch as torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+from pysentimiento import create_analyzer
+import json
+
+#opening previously obtained data
+df = pd.read_csv('../data/reddit.csv')
+df = df.fillna("")
+df.head()
+
+# function to clean strings
+def remove_nonletters(strings):
+    pattern = re.compile(r"[^a-zA-Z\s]|[\n]+")
+
+    cleaned_strings = [(pattern.sub("", i)).lower() for i in strings]
+    return cleaned_strings
+
+for col in df.columns:
+    col_clean = str(col)+"_clean"
+    df[col_clean] = remove_nonletters(df[col])
+
+
+```
+
+After cleaning characters we tokenized the texts to generate wordclous per category.
+```{python}
+#| eval: false
+
+#Cleaning stopwords
+
+import nltk
+from nltk import word_tokenize, sent_tokenize
+from nltk.probability import FreqDist
+from nltk.corpus import stopwords
+import re
+
+s_words=list(stopwords.words('english'))
+extra_s_words = ["the","to","a","and","of","i","is","you","it","i","is","ive","youve","im","dc","youre","dont","would","also","might"]
+for i in extra_s_words:
+     s_words.append(i)
+
+pattern = re.compile(r'\s*\b(' + '|'.join(s_words) + r')\b\s*', re.IGNORECASE)
+
+x = ["bikes_clean",
+     "cars_clean",
+     "walk_clean"]
+
+words = {}
+
+for col in x:
+    tokens = [word_tokenize(pattern.sub(' ', i)) for i in df[col]]
+    words[col] = " ".join([word for sentence in tokens for word in sentence])
+words
+
+# Obtaining the frequency of each word
+fdists= {}
+
+for key in words.keys():
+    tokenized_words = nltk.tokenize.word_tokenize(words[key])
+    fdist = FreqDist(tokenized_words)
+    fdists[key] = fdist
+fdists
+
+#obtaining the top frequent values and generating string to be consumed by the script to generate the wordcloud vis 
+words_freq = []
+for key_n in fdists.keys():
+    fdist = (dict(fdists[key_n].most_common(30)))
+    result =""
+    total =  sum(fdist.values())
+    for key, value in fdist.items():
+        n = (value*100) // total
+        result+= (key+" ")*n
+    words_freq.append(result)
+words_freq
+```
+
+Furthermore, to obtain the sentiment of each opinion we used a pre-trained BERT model to predict Negative, Neutral and Positive sentiment. 
+
+```{python}
+#| eval: false
+
+#Calling a bert tranformer
+analyzer = create_analyzer(task="sentiment", lang="es")
+
+#predicting sentiment using analyzer 
+
+for i in ["walk","bikes","cars"]:
+    file_name = "../data/"+i+".txt"
+    df = pd.read_csv(file_name)
+    df = df.dropna
+    col = i+"_clean"
+    sentiment = [analyzer.predict(i) for i in df[col]]
+    sent_label = [i.output for i in sentiment]
+    sent_prob = [i.probas for i in sentiment]
+
+    df_probs = pd.DataFrame(sent_prob)
+    df_probs["label"] = sent_label
+    df_probs["walk"] = df["walk_clean"]
+    
+    file_name = "../data/"+i+".csv"
+    df_probs.to_csv(file_name)
+
+#opening previously modified sentiment analysis
+b_sent = pd.read_csv("../data/bikes_sent.csv")
+c_sent = pd.read_csv("../data/cars_sent.csv")
+w_sent = pd.read_csv("../data/walk_sent.csv")
+
+# drop index
+b_sent = b_sent.drop(columns=['Unnamed: 0'])
+c_sent = c_sent.drop(columns=['Unnamed: 0'])
+w_sent = w_sent.drop(columns=['Unnamed: 0'])
+
+# add category
+b_sent["category"] = "bike"
+c_sent["category"] = "car"
+w_sent["category"] = "walk"
+
+b_sent = b_sent.rename(columns={"bikes": "text"})
+c_sent = c_sent.rename(columns={"cars": "text"})
+w_sent = w_sent.rename(columns={"walk": "text"})
+
+#generate a single dataframe
+df_sent = b_sent.append([c_sent,w_sent], ignore_index = True)
+df_sent.shape
+```
+
+Finally to have a better understanding of the sentiment we want to analyze the bigrams of words in each category to understand the words behind the opinions.
+
+```{python}
+#| eval: false
+import nltk
+from functools import reduce
+# Obtaining bigrams and generating a dictionary with their frequency
+
+bigram_freqs = []
+j = 0
+
+categories = [words[cat] for cat in words.keys()]
+flattened_text = " ".join([text for text in [words['bikes_clean'],words['cars_clean'],words['walk_clean']]])
+categories.append(flattened_text)
+
+for cat in categories:
+    #obtaining bigrams per category
+    x = pattern.sub(' ',cat )
+    x = x.replace("  "," ").replace("  "," ")
+    tokens = nltk.word_tokenize(x)
+    bigrams = list(nltk.bigrams(tokens))
+
+    y = {i:0 for i in set(bigrams)}
+
+    for bigram in bigrams:
+        y[bigram] += 1
+    bigram_freqs.append(dict(y))
+
+"""
+To observe the bigrams on a network diagram we want to store the values and their frequency on a json file with the next syntaxis:
+data = {"nodes" : [{"name":"A Chifolleau","n":1,"grp":1,"id":"A Chifolleau"}
+        "links" =[[{"source":"A Besnard","target":"M Ardisson","value":1},{"source":"A Besnard","target":"Y Holtz","value":1},
+"""
+def transform_dict(input_dict):
+    unique_words = set()
+    for key in input_dict.keys():
+        unique_words.add(key[0])
+        unique_words.add(key[1])
+
+    word_to_id = {word: i+1 for i, word in enumerate(sorted(unique_words))}
+
+    #nodes = [{'name': word, 'value': word_to_id[word], 'colour': '#bde0f6'} for word in sorted(unique_words)]
+    nodes = [{'name': word, 'n': word_to_id[word], "grp":1, "id":word} for word in sorted(unique_words)]
+
+    links = []
+    for key, value in input_dict.items():
+        source = word_to_id[key[0]]
+        target = word_to_id[key[1]]
+        #links.append({'source': word, 'target': target, 'value': value})
+        links.append({'source': key[0], 'target': key[1], 'value': value})
+
+    return {'nodes': nodes, 'links': links}
+
+
+#Function to reduce the dictionary to contain values only with 3 connections or more
+def filter_dict(d):
+    return {k: v for k, v in d.items() if v >= 3}
+
+
+filtered_bigrams = [filter_dict(i) for i in bigram_freqs]
+networks =[transform_dict(i) for i in filtered_bigrams]
+
+#storing all dictionaries in json files
+
+cat = ["bikes", "cars", "walk", "all"]
+for i in range(0,len(cat)):
+    filename = "../data/bigrams_"+cat[i]+".json"
+    with open(filename, 'w') as fp:
+        json.dump(networks[i],fp,indent=4)
+```
 
 #### 5.3 Data Visualization
 
 We generated visualizations using Plotly library in Python to analyze sentiment polarity of comments related to different categories (bike, walk, and car). We first load and clean data from three different CSV files (b_sent.csv, c_sent.csv, and w_sent.csv) which contain sentiment analysis results for reddit comments related to bikes, cars, and walking, respectively. Next, we create three box plots using Plotly, one for each category of transport. We plotted the sentiment polarity values on the y-axis, and the categories on the x-axis. After the first graph, we create a 2D histogram contour plot and two more histograms. The contour plot (trace2) shows the density of sentiment polarity values for each category, with darker areas indicating higher density. The two histograms (trace3 and trace4) show the distribution of sentiment polarity values along the x-axis and categories along the y-axis separately. The final visualizations provide insights into the sentiment polarity of comments related to different categories, allowing for a comparison of sentiment distribution across categories.
 
+```{python}
+#| eval: false
+
+trace0 = go.Box(
+    y=y0,
+    name = 'bike',
+    marker = dict(
+        color = 'rgba(148, 46, 46, 0.784)',
+    ),
+    notched=True
+)
+trace1 = go.Box(
+    y=y1,
+    name = 'walk',
+    marker = dict(
+        color = 'rgb(153, 91, 40)',
+    ),
+    notched=True
+)
+trace2 = go.Box(
+    y=y2,
+    name = 'car',
+    marker = dict(
+        color = 'rgb(214, 163, 32)',
+    ),
+    notched=True
+)
+
+data = [trace0, trace1, trace2]
+layout = go.Layout(
+    title = "Sentiment polarity boxplot by category"
+)
+
+fig = go.Figure(data=data,layout=layout)
+iplot(fig, filename = "Sentiment polarity boxplot by category")
+
+
+trace1 = go.Scatter(
+    x=df_sent['polarity'], y=df_sent['category'], mode='markers', name='points',
+    marker=dict(color='rgb(102,0,0)', size=2, opacity=0.4)
+)
+trace2 = go.Histogram2dContour(
+    x=df_sent['polarity'], y=df_sent['category'], name='density', ncontours=30,
+    colorscale='Hot', reversescale=True, showscale=False,
+    hovertemplate='<br>Polarity: %{x}<br>Category: %{y}<br>Comments: %{z}'
+)
+trace3 = go.Histogram(
+    x=df_sent['polarity'], name='Polarity',
+    marker=dict(color='rgb(214, 163, 32)'),
+    yaxis='y2',
+    hovertemplate='<br>%{x}<br>'
+)
+trace4 = go.Histogram(
+    y=df_sent['category'], name='Category', marker=dict(color='rgba(148, 46, 46, 0.784)'),
+    xaxis='x2'
+)
+data = [trace1, trace2, trace3, trace4]
+
+layout = go.Layout(
+    showlegend=False,
+    autosize=False,
+    width=800,
+    height=750,
+    xaxis=dict(
+        domain=[0, 0.85],
+        showgrid=False,
+        zeroline=False
+    ),
+    yaxis=dict(
+        domain=[0, 0.85],
+        showgrid=False,
+        zeroline=False
+    ),
+    margin=dict(
+        t=50
+    ),
+    hovermode='closest',
+    bargap=0,
+    xaxis2=dict(
+        domain=[0.85, 1],
+        showgrid=False,
+        zeroline=False
+    ),
+    yaxis2=dict(
+        domain=[0.85, 1],
+        showgrid=False,
+        zeroline=False
+    )
+)
+
+fig = go.Figure(data=data, layout=layout)
+fig.update_layout(yaxis_title="Category",xaxis_title="Polarity", title="Sentiment polarity of posts by category") 
+
+iplot(fig, filename='2dhistogram-2d-density-plot-subplots')
+
+
+```
+
+```{=html}
+#| eval: false
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+  <div id="myDiv">
+    <button id="myButton">Cars Word Cloud</button>
+  </div>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+
+  <script>
+    //Based on https://github.com/jasondavies/d3-cloud/blob/master/examples/simple.html
+    function wordCloud(div, width=500, height=500) {
+      var fill = d3.scale.category20();
+      var svg = d3.select(div).append("svg")
+                  .attr("width", width)
+                  .attr("height", height)
+                  .append("g")
+                  .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+
+      function draw(words) {
+        var cloud = svg.selectAll("g text")
+                       .data(words, function(d) { return d.text; });
+        cloud.enter()
+             .append("text")
+             .style("font-family", "Impact")
+             .style("fill", function(d, i) { return fill(i); })
+             .attr("text-anchor", "middle")
+             .attr('font-size', 1)
+             .text(function(d) { return d.text; });
+
+        //Entering and existing words
+        cloud.transition()
+             .duration(600)
+             .style("font-size", function(d) { return d.size + "px"; })
+             .attr("transform", function(d) {
+               return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+             })
+             .style("fill-opacity", 1);
+
+        //Exiting words
+        cloud.exit()
+             .transition()
+             .duration(200)
+             .style('fill-opacity', 1e-6)
+             .attr('font-size', 1)
+             .remove();
+      }
+
+      return {
+        update: function(words) {
+          d3.layout.cloud().size([width, height])
+            .words(words)
+            .padding(5)
+            .rotate(function() { return ~~(Math.random() * 2) * 90; })
+            .font("Impact")
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw)
+            .start();
+        }
+      }
+    }
+
+    var myWordCloud = wordCloud('#myDiv', 500, 500);
+
+    var words = ["a b c",
+    "x y x",
+    "x y x z e"
+    ]
+
+    function getWords(i) {
+      return words[i]
+          .replace(/[!\.,:;\?]/g, '')
+          .split(' ')
+          .map(function(d) {
+              return {text: d, size: 10 + Math.random() * 60};
+          })
+    }
+
+    function showNewWords(vis, i, updateCallback) {
+        i = i || 0;
+
+        vis.update(getWords(i ++ % words.length));
+        updateCallback();
+    }
+
+    d3.select('#myButton').on('click', function() {
+        myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
+    });
+
+    myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
+
+  </script>
+</body>
+```
