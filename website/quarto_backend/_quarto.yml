@@ -8,17 +8,8 @@ website:
       - href: index.qmd
         text: Home
       - authors.qmd
-      - sidebar:data
       - conclusion.qmd
-  sidebar:
-    - id: data
-      title: "Data"
-      contents:
-      - data_collection.qmd
-      - data_cleaning.qmd
       - methods.qmd
-
-
 format:
   html:
     code-fold: true
