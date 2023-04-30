@@ -1,0 +1,23 @@
+---
+title: "Collection"
+---
+
+## Data overview
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut maximus sem eu augue cursus maximus. Proin lacus neque, sollicitudin et vestibulum ac, placerat sit amet massa. Phasellus ac eleifend ligula, id elementum felis. Nam ac turpis efficitur, dapibus ipsum at, mollis nisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas mattis enim at ultrices maximus. Aenean vitae vehicula lorem, in maximus massa. Donec hendrerit commodo viverra. 
+
+## Data collection 
+
+Datasets and how did we gather them
+
+* Byclicles
+* Walkability
+* Health
+* Sentiment 
+* Income 
+
+API, websites (include links), problems with the data Cras viverra, magna nec mattis mollis, purus ex malesuada lectus, id posuere felis elit ac lacus. Morbi scelerisque molestie libero, eget consequat metus vehicula a. In hac habitasse platea dictumst. Sed pretium feugiat nisl vitae sodales. Maecenas aliquam porttitor vestibulum. Praesent fringilla lectus tempus porta tincidunt. Ut velit arcu, pellentesque id interdum at, mollis eu dui. Sed sollicitudin elit velit, nec eleifend nisl dictum at.
+
+Aliquam eu iaculis tellus, a lacinia lacus. Donec at placerat orci, suscipit maximus neque. Vivamus aliquet accumsan ultricies. Vivamus turpis mi, hendrerit nec massa vitae, ultricies laoreet ipsum. Cras et libero sem. Etiam at lectus ut lacus iaculis pretium. Phasellus cursus, justo in imperdiet commodo, justo odio commodo urna, in scelerisque diam dolor ac mauris. Fusce sapien tortor, dictum vitae nisi quis, rutrum faucibus est. Integer maximus eleifend efficitur. Nullam ut risus ac neque vehicula gravida et pulvinar orci. Curabitur nec hendrerit quam.
+
+Fusce ac eleifend est, et scelerisque mauris. Aliquam dignissim sem id libero mattis varius. Integer tempus semper lacus eget eleifend. Aenean iaculis, dui in commodo pharetra, justo nisl porttitor ex, a posuere nisi erat sit amet enim. Nulla mattis nec dui ac convallis. Quisque gravida mauris sed posuere dignissim. Nam placerat nunc mattis ultrices scelerisque. Etiam lectus odio, cursus a neque a, consectetur dictum urna.
