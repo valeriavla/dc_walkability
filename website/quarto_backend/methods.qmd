@@ -23,7 +23,7 @@ In order to create a clean dataset in the format we wanted, we created a script 
 
 
 ```{python}
-#| eval: false
+#| eval: true
 
 import altair as alt
 import pandas as pd
@@ -31,6 +31,8 @@ import geopandas as gpd
 from pathlib import Path
 import requests
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -41,7 +43,7 @@ IMPORT DATA
 
 # define data directory
 data_dir = Path().absolute().parent.absolute().parent/"data"
-write_data_dir = Path().absolute().parent.absolute().parent/"cleaned_data"
+write_data_dir = data_dir/"cleaned_data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
 
 # import data
@@ -49,17 +51,17 @@ walkability = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
 walkability.loc[:, 'geoid_tract_20'] = walkability.geoid_tract_20.astype(str)
 nation = pd.read_csv(data_dir/"cleaned_data"/"nation-joined_depression_cre_walkability.csv")
 
-# Ingest GEOJSON file of census tracts in DC and grab json
-req_dc = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
-json_dc = req_dc.json()
+# # Ingest GEOJSON file of census tracts in DC and grab json
+# req_dc = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+# json_dc = req_dc.json()
 
-# create geopandas dataframe and add in the walkability / outcomes data
-geo_df = gpd.GeoDataFrame.from_features((json_dc))
-merged_df = geo_df.merge(walkability,
-                         how = 'left',
-                         left_on = 'GEOID',
-                         right_on='geoid_tract_20')
-
+# # create geopandas dataframe and add in the walkability / outcomes data
+# geo_df = gpd.GeoDataFrame.from_features((json_dc))
+# merged_df = geo_df.merge(walkability,
+#                          how = 'left',
+#                          left_on = 'GEOID',
+#                          right_on='geoid_tract_20')
+merged_df = walkability.copy(deep=True)
 
 
 """
@@ -163,12 +165,13 @@ merged_df.to_csv(write_data_dir/"cleaned_walkability.csv", index = False)
 Using the Pandas, Geopandas, and Altair libraries, we generated an interactive visualization of walkability and socio-economic outcomes in Washington, D.C. To generate the interactive visualization, we used the Altair library to create a bar chart with tract or neighborhood names on the x-axis, variable names on the y-axis, and variable values as the bar heights. We further aggregate the data at the national level by calculating the average of the variable values for all neighborhoods, and store the aggregated data in a separate dataframe.
 
 ```{python}
-#| eval: false
+#| eval: true
 
+import matplotlib as mpl
 
 # define data directories
 data_dir = Path().absolute().parent.absolute().parent/"data"
-write_data_dir = Path().absolute().parent.absolute().parent/"cleaned_data"
+write_data_dir = data_dir/"cleaned_data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
 
 # read in cleaned data
@@ -176,9 +179,25 @@ neighborhood_df = pd.read_csv(write_data_dir/"neighborhood_walkability.csv")
 nation_avg = pd.read_csv(write_data_dir/"national_walkability.csv")
 merged_df = pd.read_csv(write_data_dir/"cleaned_walkability.csv")
 
+# Ingest GEOJSON file of census tracts in DC and grab json
+req_dc = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
+json_dc = req_dc.json()
+
+# create geopandas dataframe and add in the walkability / outcomes data
+geo_df = gpd.GeoDataFrame.from_features((json_dc))
+merged_df.loc[:, 'geoid_tract_20'] = merged_df.geoid_tract_20.astype(str)
+merged_df = geo_df.merge(merged_df,
+                         how = 'left',
+                         left_on = 'GEOID',
+                         right_on='geoid_tract_20')
+
+
 """
 CREATE VISUALIZATION
 """
+
+# open custom matplotlib sheet
+mpl.rc_params_from_file('style_sheet.mplstyle')  # load custom style sheet
 
 # define a click on the chloropleth map so that it can filter the bar chart
 click = alt.selection_multi(fields=['Neighborhood Name'])
@@ -254,9 +273,16 @@ nation_avg_img = (alt.Chart(nation_avg)
                         url='flag_url',
                         tooltip = ['National Average', 'value:Q']
                     ))
+                    
+alt.themes.enable('vox')  # add theme
+
 
 # plot the two graphs together
 alt.hconcat(choropleth, (bars+nation_avg_lines+nation_avg_img))
+
+
+
+
 ```
 
 ### 2. How is walkability associated with health outcomes in Washington, D.C.?
@@ -643,9 +669,14 @@ connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
 tmp2 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
 tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
 
+# Create boolean columns for rideable type and membet type
+tmp2['classic_bike'] = np.where(tmp2['rideable_type'] == 'classic_bike', 1, 0)
+tmp2['electric_bike'] = np.where(tmp2['rideable_type'] == 'electric_bike', 1, 0)
+tmp2['docked_bike'] = np.where(tmp2['rideable_type'] == 'docked_bike', 1, 0)
+
 # Temporary dataframe showing unique station locations with ride count
-tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
-tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id', 'classic_bike', 'electric_bike', 'docked_bike']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count', 'classic_bike': 'sum', 'electric_bike':'sum', 'docked_bike':'sum'}).reset_index()
+tmp2.rename(columns= {'ride_id':'count_rides', 'classic_bike': 'count_classic', 'electric_bike': 'count_electric', 'docked_bike': 'count_dock'}, inplace = True)
 tmp2['color'] = 'Bike Station'
 
 points = alt.Chart(tmp2).mark_circle().encode(
@@ -654,14 +685,19 @@ points = alt.Chart(tmp2).mark_circle().encode(
     color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
     size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
     order=alt.Order("count_rides:Q", sort="descending"),
-    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
-             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
-             alt.Tooltip('count_rides:Q', title='Ride Count')
+    tooltip=[
+             alt.Tooltip('start_station_id:Q', title='\U0001f4cd Start Station ID'),
+             alt.Tooltip('start_station_name:N', title='\U0001f6e3 Start Station Name'),
+             alt.Tooltip('count_rides:Q', title='\U0001f50d Ride Count'),
+             alt.Tooltip('count_classic:Q', title='\U0001f6b4 Classic Bike Count'),
+             alt.Tooltip('count_electric:Q', title='\U0001f6b5 Electric Bike Count'),
+             alt.Tooltip('count_dock:Q', title='\U0001f6b2 Docked Bike Count')
              ]
 ).add_selection(
     select_station
 )
 
+alt.themes.enable('vox')  # add theme
 
 # Show visualization
 (background + background_lanes + connections + points).configure_view(stroke=None)
