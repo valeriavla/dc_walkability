@@ -31,21 +31,7 @@ This repository has the following structure:
 ├── code/
 ├── data/
 ├──── /cleaned_data/
+├──── /raw_data/
 ├── img/
 └── website/
 ```
-
-## Code
-
-## Files
-
-## Datasets
-All data used for this project can be found within the `/data` directory. Unmodified raw data can be found within `/data/raw_data`, and any data that was manipulated and cleaned for the purpose of visualizations can be found within `data/cleaned_data`. Since majority of the raw data files were so large, they have been compressed in order to make it easier for hosting online. Descriptions of each dataset and its associated files:
-
-* Dataset name: [EPA's Walkability Index](https://catalog.data.gov/dataset/walkability-index)
-  * `data/raw_data/EPA_SmartLocationDatabase_V3_Jan_2021_Final.csv`
-    * Large datafile has been compressed. This contains all of the walkability index scores for every Census Block in the United States. 
-* Dataset Name: [U.S. Census Bureau Community Resilience Estimates](https://www.census.gov/programs-surveys/community-resilience-estimates.html)
-  * `data/raw_data/cre_equity_census_tract_data.csv`
-    * Large datafile has been compressed. This contains socioeconomic outcomes for every Census Block in the United States.
-
