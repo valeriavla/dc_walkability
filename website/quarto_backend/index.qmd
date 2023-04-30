@@ -2,6 +2,89 @@
 title: "Walkability in D.C."
 ---
 
+Did you know...
+```{=html}
+<body>
+  <style>
+    .slidecontainer {
+      width: 100%;
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      background: url("https://thumbs.dreamstime.com/b/black-asphalt-background-texture-white-line-banner-horizontal-179544853.jpg") no-repeat center;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+    
+    .slider:hover {
+      opacity: 1;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 50px;
+      height: 51px;
+      border: 0;
+      background: url("https://www.laps.fr/img/cms/road.png") no-repeat center;
+      background-size: 100% 100%;
+      cursor: pointer;
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 50px;
+      height: 51px;
+      background: url("https://www.laps.fr/img/cms/road.png") no-repeat center;
+      border: 0;
+      background-size: 100% 100%;
+      cursor: pointer;
+    }
+    
+    /* Add this CSS */
+    #demo {
+      display: none;
+    }
+  </style>
+  <div class="slidecontainer">
+    <input type="range" min="1" max="100" value="1" class="slider" id="myRange">
+    <!-- Hide this initially -->
+    <p><span id="demo"></span></p>
+  </div>
+  
+  <script>
+  var slider = document.getElementById("myRange");
+  var output = document.getElementById("demo");
+  
+  slider.addEventListener("input", function() {
+    // Make the output element visible when the slider value changes
+    output.style.display = "block";
+    
+    var val = this.value;
+    if (val >= 0 && val <= 20) {
+      output.innerHTML = "D.C. has the second-highest percentage of public transit commuters in the U.S.";
+    } else if (val > 20 && val <= 40) {
+      output.innerHTML = "58% of commuter trips are by bike, walking or public transit";
+    } else if (val > 40 && val <= 60) {
+      output.innerHTML = "Metro began building its rail system in 1969";
+    } else if (val > 60 && val <= 80) {
+      output.innerHTML = "D.C. has about 60 miles of on-street bike lanes";
+    } else if (val > 80 && val <= 100) {
+      output.innerHTML = "Metrorail serves 97 stations and has 128 miles of track";
+    }
+  });
+  </script>
+  
+  </body>
+```
+
+
 ## Introduction
 
 Walkability is defined as the ease with which people can access amenities in a place without the use of cars. Walkability is associated with equitable access to key resources as well as positive outcomes in health, social bonding and community-building, sustainability, and the economy. While urban areas in the US initially developed around transportation by foot, the mass introduction of cars and motorized vehicles in the 1950s led to urban sprawl, which is an expansion pattern consisting of low-density areas and car-dependent lifestyles[^1]. A report by the Institute for Transportation and Development Policy evaluated the walkability of nearly 1,000 cities globally. The report placed London, Hong Kong, Paris, and Bogotá as cities with highest walkability scores and U.S. cities particularly low on the list as a result of urban sprawl[^2]. 
@@ -40,10 +123,11 @@ IMPORT DATA
 
 # define data directory
 data_dir = Path().absolute().parent.absolute().parent/"data"
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
 
 # import data
-walkability = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
+walkability = pd.read_csv(raw_data_dir/"joined_depression_cre_walkability.csv")
 walkability.loc[:, 'geoid_tract_20'] = walkability.geoid_tract_20.astype(str)
 nation = pd.read_csv(data_dir/"cleaned_data"/"nation-joined_depression_cre_walkability.csv")
 
@@ -267,8 +351,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # import the csv
 data_dir = Path().absolute().parent.absolute().parent/"data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
 
-dc_health_df = pd.read_csv(data_dir/"PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv")
+dc_health_df = pd.read_csv(raw_data_dir/"PLACES__Census_Tract_Data__GIS_Friendly_Format___2022_release (1).csv")
 
 # filter for where StateAbbr = DC
 dc_health_df = dc_health_df[dc_health_df['StateAbbr'] == 'DC']
@@ -462,7 +547,7 @@ fig.show()
 
 # Import walkability data
 
-df_walk = pd.read_csv(data_dir/"joined_depression_cre_walkability.csv")
+df_walk = pd.read_csv(raw_data_dir/"joined_depression_cre_walkability.csv")
 dc_health_df.rename(columns={'TractFIPS': 'census_tract'}, inplace=True)
 df_walk.rename(columns={'geoid_tract_20': 'census_tract'}, inplace=True)
 # Merge the two dataframes
@@ -634,7 +719,6 @@ After examining the relationship between walkability and socioeconomic outcomes,
 Upon exploring the different health metrics, we can see that neighborhoods with low walkability fare worse at many health metrics, such as percentage of adults who lost all their adult teeth and percentage of adults who are physically inactive. This makes sense because lower walkability makes it harder to be physically active. In addition, oral health is correlated to diverse health outcomes including oral health. However, there are interactions between health outcomes, such as the impact of poor oral health on physical activity, that might not point to a straightforward causal relationship between walkability and a particular health outcome.[^3] We can reference the first graph that shows the relationship between pairs of health metrics to understand interactions between health metrics more. 
 
 
-
 ## 3. How accessible are neighborhoods in Washington, D.C. by bike?
 ```{python}
 import pandas as pd
@@ -647,6 +731,7 @@ import json
 import warnings
 from pathlib import Path
 warnings.filterwarnings('ignore')
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
 
 bikeshare_df = pd.read_csv(Path().absolute().parent.absolute().parent/"data/cleaned_data/bikeshare_cleaned.csv")
 # Create list of bikeshare stations outside of DC
@@ -676,14 +761,10 @@ nondc_stations = [
     31013,31002,31007,31000,31003,31096,31070,31039,31034,31025,31038,31026,31050,31940,31089,
     31031,31051,31937,31016,31018,31039,31015,31917,31076,31939,32409
 ]
-
 alt.data_transformers.enable('default',max_rows=None)
-
 #### BACKGROUND FOR DC MAP 
-
 # Define background of Washington D.C.
 response1 = requests.get('https://raw.githubusercontent.com/arcee123/GIS_GEOJSON_CENSUS_TRACTS/master/11.geojson')
-
 background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bike Lanes, Capital Bikeshare Stations, & Routes in March 2023").mark_geoshape(
         fill="lightgray",
         stroke='white',
@@ -693,14 +774,10 @@ background = alt.Chart(alt.Data(values=response1.json()), title= "Map of D.C. Bi
         width=600,
         height=600
     )
-
 #### BACKGROUND FOR DC BIKE LANE LOCATIONS 
-
 # Open GeoJSON file for bicycle lanes
-with open(data_dir/'Bicycle_Lanes.geojson') as f:
+with open(raw_data_dir/'Bicycle_Lanes.geojson') as f:
     data = json.load(f)
-
-
 # Create background of D.C.
 background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
         stroke='#d6a320',
@@ -709,25 +786,17 @@ background_lanes = alt.Chart(alt.Data(values=data)).mark_geoshape(
         width=600,
         height=600
     )
-
-
-
 #### MOUSEOVER SELECTION
-
 # Create mouseover selection
 select_station = alt.selection_single(
     on="mouseover", nearest=True, fields=["start_station_name"], empty='none'
 )
-
 #### NETWORK CONNECTIONS FOR MAP 
-
 # Filter non-DC stations
 tmp1 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
 tmp1 = tmp1[~tmp1['end_station_id'].isin(nondc_stations)]
-
 # Keep only relevant columns and drop duplicates to have one row per route
 tmp1 = tmp1[['start_station_name', 'start_station_id', 'end_station_name', 'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng']].drop_duplicates()
-
 # Define connections
 connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
     latitude="start_lat:Q",
@@ -737,33 +806,36 @@ connections = alt.Chart(tmp1).mark_rule(opacity=0.35).encode(
 ).transform_filter(
     select_station
 )
-
 #### POINTS FOR MAP 
-
 # Filter non-DC stations
 tmp2 = bikeshare_df[~bikeshare_df['start_station_id'].isin(nondc_stations)]
 tmp2 = tmp2[~tmp2['end_station_id'].isin(nondc_stations)]
-
+# Create boolean columns for rideable type and membet type
+tmp2['classic_bike'] = np.where(tmp2['rideable_type'] == 'classic_bike', 1, 0)
+tmp2['electric_bike'] = np.where(tmp2['rideable_type'] == 'electric_bike', 1, 0)
+tmp2['docked_bike'] = np.where(tmp2['rideable_type'] == 'docked_bike', 1, 0)
 # Temporary dataframe showing unique station locations with ride count
-tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count'}).reset_index()
-tmp2.rename(columns= {'ride_id':'count_rides'}, inplace = True)
+tmp2 = tmp2[['start_station_name','start_station_id', 'start_lng', 'start_lat', 'ride_id', 'classic_bike', 'electric_bike', 'docked_bike']].groupby(['start_station_name', 'start_station_id','start_lng', 'start_lat']).agg({'ride_id': 'count', 'classic_bike': 'sum', 'electric_bike':'sum', 'docked_bike':'sum'}).reset_index()
+tmp2.rename(columns= {'ride_id':'count_rides', 'classic_bike': 'count_classic', 'electric_bike': 'count_electric', 'docked_bike': 'count_dock'}, inplace = True)
 tmp2['color'] = 'Bike Station'
-
 points = alt.Chart(tmp2).mark_circle().encode(
     latitude="start_lat:Q",
     longitude="start_lng:Q",
     color = alt.Color('color:N', title = "Legend", scale = alt.Scale(domain=['Bike Station', 'Bike Lane'],range=['#962e2ec8', '#d6a320'])),
     size=alt.Size("count_rides:Q", scale=alt.Scale(range=[15, 250]), legend=None),
     order=alt.Order("count_rides:Q", sort="descending"),
-    tooltip=[alt.Tooltip('start_station_name:N', title='Start Station Name'),
-             alt.Tooltip('start_station_id:Q', title='Start Station ID'),
-             alt.Tooltip('count_rides:Q', title='Ride Count')
+    tooltip=[
+             alt.Tooltip('start_station_id:Q', title='\U0001f4cd Start Station ID'),
+             alt.Tooltip('start_station_name:N', title='\U0001f6e3 Start Station Name'),
+             alt.Tooltip('count_rides:Q', title='\U0001f50d Ride Count'),
+             alt.Tooltip('count_classic:Q', title='\U0001f6b4 Classic Bike Count'),
+             alt.Tooltip('count_electric:Q', title='\U0001f6b5 Electric Bike Count'),
+             alt.Tooltip('count_dock:Q', title='\U0001f6b2 Docked Bike Count')
              ]
 ).add_selection(
     select_station
 )
-
-
+alt.themes.enable('vox')  # add theme
 # Show visualization
 (background + background_lanes + connections + points).configure_view(stroke=None)
 ```
@@ -793,13 +865,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 from pathlib import Path
+
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
+
 data_dir = Path().absolute().parent.absolute().parent/"data"
 write_data_dir = data_dir/"cleaned_data"
 
 # Read in data
-df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
+df = pd.read_csv(raw_data_dir/'wmata.csv', encoding='utf-16', delimiter="\t")
 
 # Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
 df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
@@ -822,8 +896,8 @@ new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U
 
 
 # Save pivot_df and new_df to csv
-pivot_df.to_csv('../../data/cleaned_data/wmata_cleaned.csv')
-new_df.to_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+pivot_df.to_csv(write_data_dir/'wmata_cleaned.csv')
+new_df.to_csv(write_data_dir/'wmata_new_cleaned.csv')
 
 # Build interactive timeseries plot using plotly
 # Import libraries
@@ -1073,10 +1147,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #opening previously modified sentiment analysis
 data_dir = Path().absolute().parent.absolute().parent/"data"
 img_dir = Path().absolute().parent.absolute().parent/"data"/"img"
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
 
-b_sent = pd.read_csv(data_dir/"bikes_sent.csv")
-c_sent = pd.read_csv(data_dir/"cars_sent.csv")
-w_sent = pd.read_csv(data_dir/"walk_sent.csv")
+b_sent = pd.read_csv(raw_data_dir/"bikes_sent.csv")
+c_sent = pd.read_csv(raw_data_dir/"cars_sent.csv")
+w_sent = pd.read_csv(raw_data_dir/"walk_sent.csv")
 
 # drop index
 b_sent = b_sent.drop(columns=['Unnamed: 0'])
@@ -1336,8 +1411,8 @@ chart_2 = {
   const nodes = data_2.nodes.map(d => Object.create(d));
 
   const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(d => d.id).distance(40))
-      .force("charge", d3.forceManyBody().strength(-40))
+      .force("link", d3.forceLink(links).id(d => d.id).distance(30))
+      .force("charge", d3.forceManyBody().strength(-30))
       .force('collision', d3.forceCollide().radius(10))
       .force("center", d3.forceCenter(width / 2, height / 2));
 

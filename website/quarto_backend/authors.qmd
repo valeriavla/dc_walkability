@@ -1,18 +1,26 @@
 ---
 title: "Authors"
 ---
+<h3><a href="mailto: clc317@georgetown.edu">Corrina Calanoc</a></h3>
+<img src="..\..\img\corrina.jpg" alt="Image" style="width: 200px; height: 200px;">
+<br>
+<br>
+<h3><a href="mailto: cn524@georgetown.edu">Cynthia Ng</a></h3>
+<img src="..\..\img\cynthia.jpg" alt="Image" style="width: 200px; height: 200px;">
+<br>
+<br>
 
-## Corrina Calanoc <clc317@georgetown.edu>
-![](img/corrina.jpg)
+<h3><a href="mailto: kam515@georgetown.edu">Katherine Mead</a></h3>
+<img src="..\..\img\katie.jpg" alt="Image" style="width: 200px; height: 200px;">
+<br>
+<br>
 
-## Cynthia Ng <cn524@georgetown.edu>
-![](img/cynthia.jpg)
+<h3><a href="mailto: mv790@georgetown.edu">Madelyne Ventura</a></h3>
+<img src="..\..\img\madelyne.jpg" alt="Image" style="width: 200px; height: 200px;">
+<br>
+<br>
 
-## Katherine Mead <kam515@georgetown.edu>
-![](img/katie.jpg)
-
-## Madelyne Ventura <mv790@georgetown.edu>
-![](img/madelyne.jpg)
-
-## Valeria Vera Lagos <vv188@georgetown.edu>
-![](img/valeria.jpg)
+<h3><a href="mailto: vv188@georgetown.edu">Valeria Vera Lagos</a></h3>
+<img src="..\..\img\valeria.jpg" alt="Image" style="width: 200px; height: 200px;">
+<br>
+<br>
