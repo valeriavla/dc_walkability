@@ -96,13 +96,23 @@ from IPython.display import display, HTML
 df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
 df.Date = pd.to_datetime(df.Date)
 weekly_df = df.groupby([pd.Grouper(key = 'Date', freq = 'W'), 'Station'])['Entries'].sum().reset_index()
-weekly_df.Date = weekly_df.Date.dt.strftime('%m/%d/%Y')
 
-headerColor = '#962E2E'
-rowEvenColor = 'lightgrey'
+# sort so that the one with most ridership per week is on top
+weekly_df = weekly_df.sort_values(by=['Date', 'Entries'], ascending=[True, False])
+
+# format the dates so they look cleaner in the table
+weekly_df.Date = weekly_df.Date.dt.strftime('%B %-d')
+# format number of rides
+weekly_df['Entries'] = weekly_df['Entries'].apply(lambda x: "{:,}".format(int(x)))
+
+headerColor = '#962E2E' # red part of theme
+rowEvenColor = '#FDE6AB' # ligher yellow part of theme
+rowEvenColor2 = 'lightgray' # ligher yellow part of theme
 rowOddColor = 'white'
+num_stations = weekly_df.Station.nunique()
+num_days = weekly_df.Date.nunique()
 
-fig = go.Figure(data=[go.Table(
+table_fig = go.Figure(data=[go.Table(
   header=dict(
     values=['Start of Week', 'Metro Station', 'Num. of Riders over 7 Days'],
     line_color='darkslategray',
@@ -115,12 +125,18 @@ fig = go.Figure(data=[go.Table(
     line_color='darkslategray',
     # 2-D list of colors for alternating rows
     fill_color = [[rowOddColor,rowEvenColor]*(int(len(df)/2)+len(df)%2)],
+    # fill_color = [([rowOddColor]*num_stations+[rowEvenColor]*num_stations)*(int(num_days/2)+ (num_days%2))],
+    # fill_color = [([rowOddColor,rowEvenColor]*(int(num_stations/2)+(num_stations%2))+[rowOddColor,rowEvenColor2]*(int(num_stations/2)+(num_stations%2)))*(int(len(df)/(num_stations*2)) + len(df)%(num_stations*2))],
     align = ['center'],
     font = dict(color = 'darkslategray', size = 11)
     ))
 ])
 
-fig.show()
+table_fig.update_layout(title_text = 'Weekly D.C. Metro Ridership')
+
+table_fig.update_layout({'margin': {'t': 50
+                        }})
+table_fig.show()
 # table_fig = go.Figure(data=[go.Table(
 #     header=dict(values=list(df.columns),
 #                 fill_color="#962E2E",
