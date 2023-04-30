@@ -12,9 +12,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
+
+data_dir = Path().absolute().parent.absolute().parent/"data"
+write_data_dir = data_dir/"cleaned_data"
 
 # Read in data
-df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
+df = pd.read_csv(data_dir / 'wmata.csv', encoding='utf-16', delimiter="\t")
 
 # Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
 df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
@@ -35,15 +39,24 @@ pivot_df = pivot_df.sort_index()
 # Select stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from pivot_df
 new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U', 'Gallery Place', 'Capitol South']]
 
+# weekly rides per station
 
 # Save pivot_df and new_df to csv
-pivot_df.to_csv('../../data/cleaned_data/wmata_cleaned.csv')
-new_df.to_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+pivot_df.to_csv(write_data_dir / 'wmata_cleaned.csv', index= False)
+new_df.to_csv(write_data_dir / 'wmata_new_cleaned.csv', index= False)
+df.to_csv(write_data_dir / 'wmata_long_cleaned.csv', index= False)
 
+```
+
+```{python}
 # Build interactive timeseries plot using plotly
 # Import libraries
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import matplotlib as mpl
+
+
+mpl.rc_params_from_file('style_sheet.mplstyle')  # load custom style sheet
 
 # List all stations
 stations = list(new_df.columns)
@@ -80,8 +93,44 @@ fig.show()
 from IPython.display import display, HTML
 
 # Import pivot_df from the file
-pivot_df = pd.read_csv('../../data/cleaned_data/wmata_cleaned.csv')
-display(HTML(pivot_df.to_html()))
+df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
+df.Date = pd.to_datetime(df.Date)
+weekly_df = df.groupby([pd.Grouper(key = 'Date', freq = 'W'), 'Station'])['Entries'].sum().reset_index()
+weekly_df.Date = weekly_df.Date.dt.strftime('%m/%d/%Y')
+
+headerColor = '#962E2E'
+rowEvenColor = 'lightgrey'
+rowOddColor = 'white'
+
+fig = go.Figure(data=[go.Table(
+  header=dict(
+    values=['Start of Week', 'Metro Station', 'Num. of Riders over 7 Days'],
+    line_color='darkslategray',
+    fill_color=headerColor,
+    align=['center'],
+    font=dict(color='white', size=12)
+  ),
+  cells=dict(
+    values=[weekly_df.Date, weekly_df.Station, weekly_df.Entries],
+    line_color='darkslategray',
+    # 2-D list of colors for alternating rows
+    fill_color = [[rowOddColor,rowEvenColor]*(int(len(df)/2)+len(df)%2)],
+    align = ['center'],
+    font = dict(color = 'darkslategray', size = 11)
+    ))
+])
+
+fig.show()
+# table_fig = go.Figure(data=[go.Table(
+#     header=dict(values=list(df.columns),
+#                 fill_color="#962E2E",
+#                 align='left'),
+#     cells=dict(values=[df.Date, df.Station, df.Entries],
+#                fill_color='#FDFDFD',
+#                align='left'))
+# ])
+
+# table_fig.show()
 
 ```
 
