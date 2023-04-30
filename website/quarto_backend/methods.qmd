@@ -23,7 +23,7 @@ In order to create a clean dataset in the format we wanted, we created a script 
 
 
 ```{python}
-#| eval: true
+#| eval: false
 
 import altair as alt
 import pandas as pd
@@ -165,7 +165,7 @@ merged_df.to_csv(write_data_dir/"cleaned_walkability.csv", index = False)
 Using the Pandas, Geopandas, and Altair libraries, we generated an interactive visualization of walkability and socio-economic outcomes in Washington, D.C. To generate the interactive visualization, we used the Altair library to create a bar chart with tract or neighborhood names on the x-axis, variable names on the y-axis, and variable values as the bar heights. We further aggregate the data at the national level by calculating the average of the variable values for all neighborhoods, and store the aggregated data in a separate dataframe.
 
 ```{python}
-#| eval: true
+#| eval: false
 
 import matplotlib as mpl
 
@@ -275,14 +275,8 @@ nation_avg_img = (alt.Chart(nation_avg)
                     ))
                     
 alt.themes.enable('vox')  # add theme
-
-
 # plot the two graphs together
 alt.hconcat(choropleth, (bars+nation_avg_lines+nation_avg_img))
-
-
-
-
 ```
 
 ### 2. How is walkability associated with health outcomes in Washington, D.C.?
@@ -698,7 +692,6 @@ points = alt.Chart(tmp2).mark_circle().encode(
 )
 
 alt.themes.enable('vox')  # add theme
-
 # Show visualization
 (background + background_lanes + connections + points).configure_view(stroke=None)
 ```
@@ -715,45 +708,128 @@ In answering this question, we built an interactive timeseries plot of the Washi
 
 ```{python}
 #| eval: false
-
 # Import libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from pathlib import Path
+data_dir = Path().absolute().parent.absolute().parent/"data"
+write_data_dir = data_dir/"cleaned_data"
 # Read in data
-df = pd.read_csv('../../data/wmata.csv', encoding='utf-16', delimiter="\t")
-
+df = pd.read_csv(data_dir / 'wmata.csv', encoding='utf-16', delimiter="\t")
 # Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
 df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
-
 # Rename columns 
 df = df.rename(columns={'Date_This_Year': 'Date'})
 df = df.rename(columns={'Entries_This_Year': 'Entries'})
-
 # Pivot data
 pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
-
 # Convert index of pivot_df to datetime
 pivot_df.index = pd.to_datetime(pivot_df.index)
-
 # Organize index of pivot_df from earliest to latest date
 pivot_df = pivot_df.sort_index()
-
 # Select stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from pivot_df
 new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U', 'Gallery Place', 'Capitol South']]
-
-
+# weekly rides per station
 # Save pivot_df and new_df to csv
-pivot_df.to_csv('../../data/cleaned_data/wmata_cleaned.csv')
-new_df.to_csv('../../data/cleaned_data/wmata_new_cleaned.csv')
+pivot_df.to_csv(write_data_dir / 'wmata_cleaned.csv', index= False)
+new_df.to_csv(write_data_dir / 'wmata_new_cleaned.csv', index= False)
+df.to_csv(write_data_dir / 'wmata_long_cleaned.csv', index= False)
 ```
 
 
 #### 4.3 Data Visualization
 
 Using the cleaned data, we built an interactive time series plot using the plotly.graph_objects and plotly.subplots libraries. We read in the cleaned data (wmata_new_cleaned.csv) and created a list of all the unique station names in the dataset. We created a subplot with one trace per station and used a for loop to iterate through each unique station in the dataset, adding the corresponding trace to the subplot. Then, we created a dropdown menu to allow users to input a station from the list of stations available. Each station is represented in a button. When a user picks a station by selecting the corresponding button, the method updates the visibility of the trace to reflect the entries by day at the selected station. The layout of the plot is updated to include the dropdown menu and to set the title, axis labels, and fixed axis ranges. The fig.show() method to display the plot.
+
+```{python}
+#| eval: false
+
+# Build interactive timeseries plot using plotly
+# Import libraries
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import matplotlib as mpl
+mpl.rc_params_from_file('style_sheet.mplstyle')  # load custom style sheet
+# List all stations
+stations = list(new_df.columns)
+# Create subplot with one trace per station
+fig = make_subplots(rows=1, cols=1)
+for station in stations:
+    fig.add_trace(
+        go.Scatter(x=new_df.index, y=new_df[station], name=station),
+        row=1, col=1
+    )
+# Create dropdown menu to select station
+buttons = []
+for station in stations:
+    buttons.append(
+        dict(method='update', label=station, args=[{'visible': [station == s for s in stations]}])
+    )
+dropdown = dict(
+    active=0, buttons=buttons, direction='down', showactive=True, x=1.1, y=1.1
+)
+# Update layout
+fig.update_layout(
+    updatemenus=[dropdown], height=600, width=900,
+    title='WMATA Metro Entries by Selected Station and Date in March 2023', xaxis_title='Date', yaxis_title='Entries',
+    yaxis=dict(range=[0, 3000])
+)
+# Show plot
+fig.show()
+#### Table
+from IPython.display import display, HTML
+# Import pivot_df from the file
+df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
+df.Date = pd.to_datetime(df.Date)
+weekly_df = df.groupby([pd.Grouper(key = 'Date', freq = 'W'), 'Station'])['Entries'].sum().reset_index()
+# sort so that the one with most ridership per week is on top
+weekly_df = weekly_df.sort_values(by=['Date', 'Entries'], ascending=[True, False])
+# format the dates so they look cleaner in the table
+weekly_df.Date = weekly_df.Date.dt.strftime('%B %-d')
+# format number of rides
+weekly_df['Entries'] = weekly_df['Entries'].apply(lambda x: "{:,}".format(int(x)))
+headerColor = '#962E2E' # red part of theme
+rowEvenColor = '#FDE6AB' # ligher yellow part of theme
+rowEvenColor2 = 'lightgray' # ligher yellow part of theme
+rowOddColor = 'white'
+num_stations = weekly_df.Station.nunique()
+num_days = weekly_df.Date.nunique()
+table_fig = go.Figure(data=[go.Table(
+  header=dict(
+    values=['Start of Week', 'Metro Station', 'Num. of Riders over 7 Days'],
+    line_color='darkslategray',
+    fill_color=headerColor,
+    align=['center'],
+    font=dict(color='white', size=12)
+  ),
+  cells=dict(
+    values=[weekly_df.Date, weekly_df.Station, weekly_df.Entries],
+    line_color='darkslategray',
+    # 2-D list of colors for alternating rows
+    fill_color = [[rowOddColor,rowEvenColor]*(int(len(df)/2)+len(df)%2)],
+    # fill_color = [([rowOddColor]*num_stations+[rowEvenColor]*num_stations)*(int(num_days/2)+ (num_days%2))],
+    # fill_color = [([rowOddColor,rowEvenColor]*(int(num_stations/2)+(num_stations%2))+[rowOddColor,rowEvenColor2]*(int(num_stations/2)+(num_stations%2)))*(int(len(df)/(num_stations*2)) + len(df)%(num_stations*2))],
+    align = ['center'],
+    font = dict(color = 'darkslategray', size = 11)
+    ))
+])
+table_fig.update_layout(title_text = 'Weekly D.C. Metro Ridership')
+table_fig.update_layout({'margin': {'t': 50
+                        }})
+table_fig.show()
+# table_fig = go.Figure(data=[go.Table(
+#     header=dict(values=list(df.columns),
+#                 fill_color="#962E2E",
+#                 align='left'),
+#     cells=dict(values=[df.Date, df.Station, df.Entries],
+#                fill_color='#FDFDFD',
+#                align='left'))
+# ])
+# table_fig.show()
+
+```
 
 ### 5. What is public sentiment around walkability in Washington, D.C.? 
 
@@ -1121,100 +1197,170 @@ iplot(fig, filename='2dhistogram-2d-density-plot-subplots')
 
 ```
 
-```{=html}
+```{html}
 #| eval: false
-<!DOCTYPE html>
-<meta charset="utf-8">
-<body>
-  <div id="myDiv">
-    <button id="myButton">Cars Word Cloud</button>
-  </div>
 
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="https://rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+chart = {
+  const links = data.links.map(d => Object.create(d));
+  const nodes = data.nodes.map(d => Object.create(d));
 
-  <script>
-    //Based on https://github.com/jasondavies/d3-cloud/blob/master/examples/simple.html
-    function wordCloud(div, width=500, height=500) {
-      var fill = d3.scale.category20();
-      var svg = d3.select(div).append("svg")
-                  .attr("width", width)
-                  .attr("height", height)
-                  .append("g")
-                  .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+  const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(40))
+      .force("charge", d3.forceManyBody().strength(-40))
+      .force('collision', d3.forceCollide().radius(10))
+      .force("center", d3.forceCenter(width / 2, height / 2));
 
-      function draw(words) {
-        var cloud = svg.selectAll("g text")
-                       .data(words, function(d) { return d.text; });
-        cloud.enter()
-             .append("text")
-             .style("font-family", "Impact")
-             .style("fill", function(d, i) { return fill(i); })
-             .attr("text-anchor", "middle")
-             .attr('font-size', 1)
-             .text(function(d) { return d.text; });
+  const svg = d3.select(DOM.svg(width, height));
 
-        //Entering and existing words
-        cloud.transition()
-             .duration(600)
-             .style("font-size", function(d) { return d.size + "px"; })
-             .attr("transform", function(d) {
-               return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-             })
-             .style("fill-opacity", 1);
+  const link = svg.append("g")
+      .attr("stroke-opacity", 0.2)
+    .selectAll("path")
+    .data(links)
+    .join("path")
+      .attr("stroke-width", 2)
+      .attr("stroke", color)
+      .attr("fill", "transparent");
 
-        //Exiting words
-        cloud.exit()
-             .transition()
-             .duration(200)
-             .style('fill-opacity', 1e-6)
-             .attr('font-size', 1)
-             .remove();
-      }
+  const node = svg.append("g")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 0)
+    .selectAll("circle")
+    .data(nodes)
+    .join("circle")
+      .attr("r", 6)
+      .attr("fill", "#555")
+      .call(drag(simulation))
+  
+  const textElements = svg.append('g')
+    .selectAll('text')
+    .data(nodes)
+    .enter().append('text')
+      .text(node => node.id)
+      .attr('font-size', 10)
+      .attr("font-family", "Helvetica")
+      .attr("fill", "#555")
+      .attr('dx', 10)
+      .attr('dy', 4)
 
-      return {
-        update: function(words) {
-          d3.layout.cloud().size([width, height])
-            .words(words)
-            .padding(5)
-            .rotate(function() { return ~~(Math.random() * 2) * 90; })
-            .font("Impact")
-            .fontSize(function(d) { return d.size; })
-            .on("end", draw)
-            .start();
-        }
-      }
-    }
+  simulation.on("tick", () => {
+    link
+      .attr("d", function(d) {
+      var dx = d.target.x - d.source.x,
+          dy = d.target.y - d.source.y,
+          dr = Math.sqrt(dx * dx + dy * dy);
+      return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+  });
+    
+    textElements
+        .attr("x", node => node.x)
+        .attr("y", node => node.y)
+    
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+  });
 
-    var myWordCloud = wordCloud('#myDiv', 500, 500);
+  invalidation.then(() => simulation.stop());
+  
+  return svg.node();
+}
+data = FileAttachment("../../data/cleaned_data/bigrams_bikes.json").json()
 
-    var words = ["a b c",
-    "x y x",
-    "x y x z e"
-    ]
+height = 600
+color = {
+  const scale = d3.scaleOrdinal(d3.schemeSet1);
+  return d => scale(d.group);
+}
+drag = simulation => {
+  
+  function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+  
+  function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+  
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+  
+  return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+}
+```
 
-    function getWords(i) {
-      return words[i]
-          .replace(/[!\.,:;\?]/g, '')
-          .split(' ')
-          .map(function(d) {
-              return {text: d, size: 10 + Math.random() * 60};
-          })
-    }
+```{html}
+#| eval: false
 
-    function showNewWords(vis, i, updateCallback) {
-        i = i || 0;
+d3 = require("d3@7")
+d3Cloud = require("d3-cloud@1")
+import {howto} from "@d3/example-components"
 
-        vis.update(getWords(i ++ % words.length));
-        updateCallback();
-    }
+function WordCloud(title,text, {
+  size = group => group.length, // Given a grouping of words, returns the size factor for that word
+  word = d => d, // Given an item of the data array, returns the word
+  marginTop = 0, // top margin, in pixels
+  marginRight = 0, // right margin, in pixels
+  marginBottom = 0, // bottom margin, in pixels
+  marginLeft = 0, // left margin, in pixels
+  width = 640, // outer width, in pixels
+  height = 400, // outer height, in pixels
+  maxWords = 250, // maximum number of words to extract from the text
+  fontFamily = "sans-serif", // font family
+  fontScale = 30, // base font size
+  padding = 0, // amount of padding between the words (in pixels)
+  rotate = 0, // a constant or function to rotate the words
+  invalidation // when this promise resolves, stop the simulation
+} = {}) {
+  const words = typeof text === "string" ? text.split(/\W+/g) : Array.from(text);
+  
+  const data = d3.rollups(words, size, w => w)
+    .sort(([, a], [, b]) => d3.descending(a, b))
+    .slice(0, maxWords)
+    .map(([key, size]) => ({text: word(key), size}));
+  
+  const svg = d3.create("svg")
+      .attr("viewBox", [0, 0, width, height])
+      .attr("width", width)
+      .attr("font-family", fontFamily)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#962e2ec8") 
+      .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
+      .text(title);
 
-    d3.select('#myButton').on('click', function() {
-        myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
-    });
+  const g = svg.append("g").attr("transform", `translate(${marginLeft},${marginTop})`);
 
-    myWordCloud.update(getWords(Math.floor(Math.random() * words.length)));
+  const cloud = d3Cloud()
+      .size([width - marginLeft - marginRight, height - marginTop - marginBottom])
+      .words(data)
+      .padding(padding)
+      .rotate(rotate)
+      .font(fontFamily)
+      .fontSize(d => Math.sqrt(d.size) * fontScale)
+      .on("word", ({size, x, y, rotate, text}) => {
+        g.append("text")
+            .attr("font-size", size)
+            .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
+            .text(text);
+      });
 
-  </script>
-</body>
+  cloud.start();
+  invalidation && invalidation.then(() => cloud.stop());
+  return svg.node();
+}
+WordCloud("Bicycle","bike bike bike bike bike bike bike bike bike bike bike bike bike get get get get get get one one one one lanes lanes lanes lanes good good good good trail trail trail trail st st st lane lane lane park park park like like like street street street city city mbt mbt bikes bikes many many ride ride trails trails way way pretty pretty people people th th go go rock rock creek creek nw nw map map take take lock lock want want much much", {
+  width: 250,
+  height: 100,
+  size: () => .3 + Math.random(),
+  rotate: () => (~~(Math.random() * 6) - 3) * 30
+})
+
 ```
