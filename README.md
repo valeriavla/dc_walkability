@@ -27,7 +27,9 @@ Code Files:
   * WMTA rides per station
   * Walkability scores and socioeconomic outcomes data
   * Walkability scores and health outcomes data
-These jupyter notebooks were each rendered into a .qmd file and those were compiled into one .qmd file and converted to an HTML. 
+  * Sentiment analysis of Walkability and transportation methods
+  
+These jupyter notebooks were each rendered into a .qmd file and those were compiled into one .qmd file to be later converted into an HTML. 
 
 Datasets:
 * U.S. Environmental Protection Agency Walkability: A GeoPandas dataframe was created from a GeoJSON file of D.C. and joined with the Walkability Index and Community Resilience data using Census Tract IDs. All outcome columns were rescaled to 0-100 to ensure consistent scales for visualizations.
