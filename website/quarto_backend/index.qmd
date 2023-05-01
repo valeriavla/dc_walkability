@@ -1143,6 +1143,7 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import json
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+from pathlib import Path
 
 #opening previously modified sentiment analysis
 data_dir = Path().absolute().parent.absolute().parent/"data"
@@ -1222,9 +1223,9 @@ font_dict=dict(family='Arial',
 fig.update_layout(font=font_dict)
 
 fig.update_layout(
-    plot_bgcolor='rgb(230, 230, 230)'
+    plot_bgcolor='rgb(230, 230, 230)',
+    xaxis_title="Category", yaxis_title="Polarity range"
 )
-
 iplot(fig, filename = "Sentiment polarity boxplot by category")
 ```
 
