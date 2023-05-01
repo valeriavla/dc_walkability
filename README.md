@@ -15,9 +15,11 @@ Walkability is the ease with which people can access amenities in a place withou
 
 Research Questions:
 
-1. How is walkability associated with socioeconomic and health outcomes?
-2. How accessible are neighborhoods by bike?
-3. What is public sentiment around walkability and driving
+1. How is walkabilty associated with socioeconomic outcomes in Washington, D.C.?
+2. How is walkability associated with health outcomes in Washington, D.C.?
+3. How accessible are neighborhoods in Washington, D.C. by bike? 
+4. What is metro ridership in Washington, D.C. like?
+5. What is public sentiment around walkability in Washington, D.C.?
 
 ## Description of all your code files, datasets, etc.
 
@@ -35,6 +37,7 @@ Datasets:
 * U.S. Environmental Protection Agency Walkability: A GeoPandas dataframe was created from a GeoJSON file of D.C. and joined with the Walkability Index and Community Resilience data using Census Tract IDs. All outcome columns were rescaled to 0-100 to ensure consistent scales for visualizations.
 * PLACES Census: The PLACES Census dataset was filtered to only include D.C. data. The columns were also renamed for more interpretability.
 * Bikeshare & Bike Lane Analysis: In the Capital Bikeshare dataset, the latitude and longitude values were standardized for each bike station and stations outside of the D.C. boundary were removed. Rows with incomplete trip values were removed as well. A map of the bike lanes in the city was brought in by a GeoJSON file.
+* WMATA rideshare data: This dataset shows ridership in all WMATA Metro stations in March 2023. Six stations, three of which are located in high-walkability neighborhoods and the other three of which are located in low-walkability neighborhoods, were highlighted.
 * Reddit Webscraped data: Used a webscraper to scrape Reddit posts within the /washingtondc thread. In this analysis, the text was preprocessed using the NLTK library to fine-tune a BERT sentiment analyzer and obtain sentiment scores. These scores were then analyzed by topic (Car, Walk, Bike). 
 
 
