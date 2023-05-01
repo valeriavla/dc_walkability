@@ -1,0 +1,250 @@
+---
+title: "Walkability in D.C."
+---
+
+
+## 4. What is metro ridership in Washington, D.C. like?
+
+```{python}
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+
+raw_data_dir = Path().absolute().parent.absolute().parent/"data"/"raw_data"
+
+data_dir = Path().absolute().parent.absolute().parent/"data"
+write_data_dir = data_dir/"cleaned_data"
+
+# Read in data
+df = pd.read_csv(raw_data_dir/'wmata.csv', encoding='utf-16', delimiter="\t")
+
+# Remove columns Servicetype_This_Year(group), Holiday_Last_Year, Holiday_This_Year, Servicetype_This_Year, Time_Period, and Date_Last_Year
+df = df.drop(['Day_of_Date_This_Year', 'Servicetype_This_Year_(group)', 'Holiday_Last_Year', 'Holiday_This_Year', 'Servicetype_This_Year', 'Time_Period', 'Date_Last_Year', 'Entries_Last_Year'], axis=1)
+
+# Rename columns 
+df = df.rename(columns={'Date_This_Year': 'Date'})
+df = df.rename(columns={'Entries_This_Year': 'Entries'})
+
+# Pivot data
+pivot_df = df.pivot_table(index='Date', columns='Station', values='Entries')
+
+# Convert index of pivot_df to datetime
+pivot_df.index = pd.to_datetime(pivot_df.index)
+
+# Organize index of pivot_df from earliest to latest date
+pivot_df = pivot_df.sort_index()
+
+# Select stations Anacostia, Stadium-Armory, Van Ness-UDC, Shaw-Howard Univ, Gallery Place, and Capitol South from pivot_df
+new_df = pivot_df[['Anacostia', 'Stadium-Armory', 'Van Ness-UDC', 'Shaw-Howard U', 'Gallery Place', 'Capitol South']]
+
+
+# Save pivot_df and new_df to csv
+pivot_df.to_csv(write_data_dir/'wmata_cleaned.csv')
+new_df.to_csv(write_data_dir/'wmata_new_cleaned.csv')
+
+# Build interactive timeseries plot using plotly
+# Import libraries
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# List all stations
+stations = list(new_df.columns)
+
+#Select theming colors 
+
+colors_markers = ['rgb(110, 4, 18)','rgb(214, 163, 32)','rgb(181,107,181)','rgb(196,87,80)','rgb(117, 79, 68)','rgb(128, 126, 46)']
+
+# Create subplot with one trace per station
+fig = make_subplots(rows=1, cols=1)
+ij = 0
+for station in stations:
+    fig.add_trace(
+        go.Scatter(x=new_df.index,
+        y=new_df[station],
+        name=station,
+        marker=dict(color=colors_markers[ij])
+        ),
+        row=1, 
+        col=1,
+    )
+    ij += 1
+
+# Create dropdown menu to select station
+buttons = []
+for station in stations:
+    buttons.append(
+        dict(method='update', label=station, args=[{'visible': [station == s for s in stations]}])
+    )
+dropdown = dict(
+    active=0, buttons=buttons, direction='down', showactive=True, x=1.1, y=1.1
+)
+
+# Update layout
+
+font_dict=dict(family='Arial',
+               size=14,
+               color='black'
+               )
+fig.update_layout(
+    updatemenus=[dropdown], height=600, width=600,
+    title='WMATA Metro Entries by Selected Station and Date in March 2023', xaxis_title='Date', yaxis_title='Entries',
+    yaxis=dict(range=[0, 3000]),
+    font=font_dict
+)
+# Change background color to defined colors
+fig.update_layout(
+    plot_bgcolor='rgb(230, 230, 230)'
+)
+
+# Show plot
+fig.show()
+
+#### Table
+from IPython.display import display, HTML
+
+data_dir = Path().absolute().parent.absolute().parent/"data"
+write_data_dir = data_dir/"cleaned_data"
+
+df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
+df.Date = pd.to_datetime(df.Date)
+weekly_df = df.groupby([pd.Grouper(key = 'Date', freq = 'W'), 'Station'])['Entries'].sum().reset_index()
+# sort so that the one with most ridership per week is on top
+weekly_df = weekly_df.sort_values(by=['Date', 'Entries'], ascending=[True, False])
+# format the dates so they look cleaner in the table
+weekly_df.Date = weekly_df.Date.dt.strftime('%B %-d')
+# format number of rides
+weekly_df['Entries'] = weekly_df['Entries'].apply(lambda x: "{:,}".format(int(x)))
+headerColor = '#962E2E' # red part of theme
+rowEvenColor = '#FDE6AB' # ligher yellow part of theme
+rowEvenColor2 = 'lightgray' # ligher yellow part of theme
+rowOddColor = 'white'
+num_stations = weekly_df.Station.nunique()
+num_days = weekly_df.Date.nunique()
+table_fig = go.Figure(data=[go.Table(
+  header=dict(
+    values=['Start of Week', 'Metro Station', 'Num. of Riders over 7 Days'],
+    line_color='darkslategray',
+    fill_color=headerColor,
+    align=['center'],
+    font=dict(color='white', size=12)
+  ),
+  cells=dict(
+    values=[weekly_df.Date, weekly_df.Station, weekly_df.Entries],
+    line_color='darkslategray',
+    # 2-D list of colors for alternating rows
+    fill_color = [[rowOddColor,rowEvenColor]*(int(len(df)/2)+len(df)%2)],
+    # fill_color = [([rowOddColor]*num_stations+[rowEvenColor]*num_stations)*(int(num_days/2)+ (num_days%2))],
+    # fill_color = [([rowOddColor,rowEvenColor]*(int(num_stations/2)+(num_stations%2))+[rowOddColor,rowEvenColor2]*(int(num_stations/2)+(num_stations%2)))*(int(len(df)/(num_stations*2)) + len(df)%(num_stations*2))],
+    align = ['center'],
+    font = dict(color = 'darkslategray', size = 11)
+    ))
+])
+table_fig.update_layout(title_text = 'Weekly D.C. Metro Ridership',font=font_dict)
+table_fig.update_layout({'margin': {'t': 50
+                        }})
+table_fig.show()
+# table_fig = go.Figure(data=[go.Table(
+#     header=dict(values=list(df.columns),
+#                 fill_color="#962E2E",
+#                 align='left'),
+#     cells=dict(values=[df.Date, df.Station, df.Entries],
+#                fill_color='#FDFDFD',
+#                align='left'))
+# ])
+# table_fig.show()
+```
+
+After analyzing accessibility by foot and bike, we wanted to explore another dimension of walkability--the metro. In Washington, D.C. the metro is established and managed by the Washington Metropolitan Area Transit Authority (WMATA).
+
+The plotly graph above shows the number of entries at the metro stations in the Washington, D.C. area in March 2023. The data is from the Metrorail Ridership Year-over-Year Change data [here](https://www.wmata.com/initiatives/ridership-portal/Metrorail-Ridership-Year-over-Year-Change.cfm). The graph shows number of entries at a station on various days in March 2023. Initially, the plot shows six stations' entries by day. These six stations were included because they are located on some of the most and least walkable neighborhoods in Washington, D.C. The legend at the right shows you the six different stations for which there is ridership data. The plot is interactive, so you can select a specific station at the dropdown menu at the top right corner. Upon selecting it, the graph will reflect the selected station's entries by day. You can also hover over each line where a tooltip will reveal the selected day and station as well as the number of entries accordingly. The graph is also zoomable, so you can zoom in and out to see the data more clearly. While the plot only shows six stations; however, if you want to learn more about ridership data in other stations, you can examine the table above for more details. 
+
+Overall, we see that there is a weekly pattern in ridership, where generally there are more entries on weekdays than weekends across almost all stations. This is perhaps due to the use of the metro to commute to work and activites on weekdays. Furthermore, we also observe that Gallery Place and Capitol South, which are located in tracts with higher walkability scores according to Census data have higher ridership, have significantly higher ridership than the other stations. On the contrary, Anacostia, Stadium-Armory, and Van Ness-UDC, which are located in tracts with lower walkability scores according to Census data have lower ridership. This makes sense, because stations with higher ridership are likely to be located in more walkable neighborhoods where amenities like public transport are more well-connected and accessible, whereas the opposite is the case for less walkable neighborhoods. Note also that Capitol South is located on Capitol Hill, which is a major tourist attraction and office area in Washington, D.C. and Gallery Place is located in Chinatown, which is also a major tourist attraction. These are less residential neighborhoods. 
+
+The data is limited in that there is no data on exits at a station, so the data only shows one direction of a journey––though it is appropriate to assume that a rider will likely exit at the station at the end of the day. Furthermore, the data is limited in that it only shows data for one month in 2023, so it is not representative of ridership in other months or years. However, it is still useful to see the ridership patterns in March 2023.
+
+
+```{python}
+import altair as alt
+
+# read in data
+df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
+df.Date = pd.to_datetime(df.Date)
+
+# grab the top 10 stations with highest total march ridership
+top10_stations = df.groupby('Station')['Entries'].sum().nlargest(10).reset_index().Station
+df = df[df.Station.isin(list(top10_stations))]
+# create a ranking column so that both visualizations are sorted the same
+rank_sort = dict(df.groupby('Station')['Entries'].sum())
+df.loc[:, 'rank'] = df['Station'].map(rank_sort)
+df.loc[:, 'color'] = '#d6a320'
+
+# allow for a lot of rows
+alt.data_transformers.enable('default', max_rows = None)
+
+# create the selector field
+selection = alt.selection_single(fields=['Station'],name='Random')
+# create conditional color variables for the heat map
+heatmap_color = alt.condition(selection,
+                              alt.Color('Entries:Q',
+                                scale=alt.Scale(scheme='orangered'),
+                                        legend=alt.Legend(type='symbol',
+                                                          orient='right',
+                                                          direction = 'vertical',
+                                                          legendX = .5,
+                                                          legendY = 55
+                                                         )
+                        ),
+                      alt.value('lightgray'))
+# create conditional color variables for the bar chart
+# have to create a dummy variable and adjust the color so that the legends line up
+bar_color = alt.condition(selection,
+                          alt.Color('color:N',
+                                    scale=alt.Scale(domain=['#d6a320'], # use theme color
+                                                    range=['#d6a320']),
+                                    legend=None
+                                   ),
+                          alt.value('lightgray'))
+
+# create the bar chart that shows total number of entries per station
+bar=(alt.Chart(df)
+ .mark_bar()
+ .encode(x='sum(Entries):Q',
+         y=alt.Y('Station:N',
+         sort=alt.EncodingSortField(field='rank', op='mean', 
+                            order='descending')),
+         color=bar_color
+        )
+).add_selection(selection
+).properties(
+    title = "Total March Rides for the 10 Most Popular Metro Stations"
+)
+
+# create the heatmap that shows rides over time
+heatmap = (alt.Chart(df)
+ .mark_rect()
+ .encode(x=alt.X('yearmonthdate(Date):O', title='WMATA Metro Entries'),
+         y=alt.Y('Station:N', title='Metro Station',
+                  sort=alt.EncodingSortField(field='rank',
+                    order='descending')
+                ),
+         color = heatmap_color,
+         tooltip=['Entries','Station:N']
+        )
+).properties(
+    title = 'Average Wait Time in Hong Kong Hospitals'
+)
+
+# adjust titles and axes titles
+heatmap.title ="Metro Rides Throughout March 2023"
+heatmap.encoding.x.title = 'Date'
+bar.encoding.x.title = 'Total Rides'
+heatmap.encoding.y.title = 'Station'
+alt.vconcat(bar, heatmap).resolve_scale(color='independent')
+
+```
+
+In addition to diving into the stations placed at the most and least walkable neighborhoods in D.C., we wanted to see where the most popular stations were to see if they aligned with the most walkable / bikeable areas. To no surprise, the top 10 most popular stations in March are ones all clustered around the Downtown area, which each of the stations being concerated around the center of D.C. The station furthest from this center cluster is the NoMa-Gallaudet U Station. Interestingly enough, NoMa is the newest out of all these stations, having [only opened in 2004](https://en.wikipedia.org/wiki/Washington_Metro) but is considered to be one of the most [rapidly gentrified areas in the city](https://medium.com/@ScottCRodd/gentrified-a-tale-of-two-neighborhoods-in-washington-d-c-c828b8f7a357#:~:text=On%20the%20east%20side%20is,over%203%2C800%20new%20apartment%20units.) due to the NoMa Business Improvement District (NoMa BID). This suggests that commercial investments into a neighborhood can increase the amount of Metro traffic that neighborhood gets and thus increase walkability. 
+
