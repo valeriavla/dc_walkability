@@ -1020,6 +1020,85 @@ Overall, we see that there is a weekly pattern in ridership, where generally the
 The data is limited in that there is no data on exits at a station, so the data only shows one direction of a journey––though it is appropriate to assume that a rider will likely exit at the station at the end of the day. Furthermore, the data is limited in that it only shows data for one month in 2023, so it is not representative of ridership in other months or years. However, it is still useful to see the ridership patterns in March 2023.
 
 
+```{python}
+# read in data
+df = pd.read_csv(write_data_dir / 'wmata_long_cleaned.csv')
+df.Date = pd.to_datetime(df.Date)
+
+# grab the top 10 stations with highest total march ridership
+top10_stations = df.groupby('Station')['Entries'].sum().nlargest(10).reset_index().Station
+df = df[df.Station.isin(list(top10_stations))]
+# create a ranking column so that both visualizations are sorted the same
+rank_sort = dict(df.groupby('Station')['Entries'].sum())
+df.loc[:, 'rank'] = df['Station'].map(rank_sort)
+df.loc[:, 'color'] = '#d6a320'
+
+# allow for a lot of rows
+alt.data_transformers.enable('default', max_rows = None)
+
+# create the selector field
+selection = alt.selection_single(fields=['Station'],name='Random')
+# create conditional color variables for the heat map
+heatmap_color = alt.condition(selection,
+                              alt.Color('Entries:Q',
+                                scale=alt.Scale(scheme='orangered'),
+                                        legend=alt.Legend(type='symbol',
+                                                          orient='right',
+                                                          direction = 'vertical',
+                                                          legendX = .5,
+                                                          legendY = 55
+                                                         )
+                        ),
+                      alt.value('lightgray'))
+# create conditional color variables for the bar chart
+# have to create a dummy variable and adjust the color so that the legends line up
+bar_color = alt.condition(selection,
+                          alt.Color('color:N',
+                                    scale=alt.Scale(domain=['#d6a320'], # use theme color
+                                                    range=['#d6a320']),
+                                    legend=None
+                                   ),
+                          alt.value('lightgray'))
+
+# create the bar chart that shows total number of entries per station
+bar=(alt.Chart(df)
+ .mark_bar()
+ .encode(x='sum(Entries):Q',
+         y=alt.Y('Station:N',
+         sort=alt.EncodingSortField(field='rank', op='mean', 
+                            order='descending')),
+         color=bar_color
+        )
+).add_selection(selection
+).properties(
+    title = "Total March Rides for the 10 Most Popular Metro Stations"
+)
+
+# create the heatmap that shows rides over time
+heatmap = (alt.Chart(df)
+ .mark_rect()
+ .encode(x=alt.X('yearmonthdate(Date):O', title='WMATA Metro Entries'),
+         y=alt.Y('Station:N', title='Metro Station',
+                  sort=alt.EncodingSortField(field='rank',
+                    order='descending')
+                ),
+         color = heatmap_color,
+         tooltip=['Entries','Station:N']
+        )
+).properties(
+    title = 'Average Wait Time in Hong Kong Hospitals'
+)
+
+# adjust titles and axes titles
+heatmap.title ="Metro Rides Throughout March 2023"
+heatmap.encoding.x.title = 'Date'
+bar.encoding.x.title = 'Total Rides'
+heatmap.encoding.y.title = 'Station'
+alt.vconcat(bar, heatmap).resolve_scale(color='independent')
+
+```
+
+In addition to diving into the stations placed at the most and least walkable neighborhoods in D.C., we wanted to see where the most popular stations were to see if they aligned with the most walkable / bikeable areas. To no surprise, the top 10 most popular stations in March are ones all clustered around the Downtown area, which each of the stations being concerated around the center of D.C. The station furthest from this center cluster is the NoMa-Gallaudet U Station. Interestingly enough, NoMa is the newest out of all these stations, having [only opened in 2004](https://en.wikipedia.org/wiki/Washington_Metro) but is considered to be one of the most [rapidly gentrified areas in the city](https://medium.com/@ScottCRodd/gentrified-a-tale-of-two-neighborhoods-in-washington-d-c-c828b8f7a357#:~:text=On%20the%20east%20side%20is,over%203%2C800%20new%20apartment%20units.) due to the NoMa Business Improvement District (NoMa BID). This suggests that commercial investments into a neighborhood can increase the amount of Metro traffic that neighborhood gets and thus increase walkability. 
 
 ## 5. What is public sentiment around walkability in Washington, D.C.? 
 
