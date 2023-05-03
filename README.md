@@ -57,3 +57,4 @@ This repository has the following structure:
 ├── img/
 └── website/
 ```
+an archive folder is inside each code directory containing draft codes that are stored for future development processes
